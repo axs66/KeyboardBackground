@@ -1,8 +1,8 @@
-%hook UIKeyboardImpl
+#import <Foundation/Foundation.h>
 
-- (void)handleKeyboardInput:(id)arg1 {
-    NSLog(@"[SwipeInputTweak] Keyboard input detected: %@", arg1);
-    %orig;
-}
+%hook YourClass
+
+// 在这里使用 NSLog
+NSLog(@"[SwipeInputTweak] Keyboard input detected: %@", arg1);
 
 %end
