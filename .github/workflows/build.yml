@@ -43,5 +43,5 @@ jobs:
       - name: Upload DEB to workflow artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
-          name: KeyboardBackground
+          name: keyboardbackground
           path: ${{ github.workspace }}/packages/*.deb
