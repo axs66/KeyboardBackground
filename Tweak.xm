@@ -11,12 +11,29 @@
     %orig;
     
     // 从用户设置获取背景颜色（如果没有设置，则默认蓝色）
-    UIColor *bgColor = [self fetchBackgroundColorFromDefaults];
+    UIColor *bgColor = fetchBackgroundColorFromDefaults();
     self.view.backgroundColor = bgColor;
 }
 
+// 处理输入事件：滑行输入的检测
+- (void)handleInput:(UIEvent *)event {
+    if ([event type] == UIEventTypeTouches) {
+        NSSet *touches = [event allTouches];  // 使用 allTouches 获取触摸事件
+        
+        // 检查是否有触摸事件
+        if (touches.count > 0) {
+            NSLog(@"[SwipeInputTweak] 滑行输入事件 detected");
+            // 在此处加入滑行输入的处理逻辑
+        }
+    } else {
+        %orig;  // 调用原始的输入事件处理
+    }
+}
+
+%end
+
 // 获取用户设置的背景颜色，默认是蓝色
-- (UIColor *)fetchBackgroundColorFromDefaults {
+UIColor *fetchBackgroundColorFromDefaults() {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *colorHex = [defaults stringForKey:USER_DEFAULTS_KEY];
     
@@ -38,28 +55,15 @@
 }
 
 // 自定义背景颜色设置方法
+%hook UIInputViewController
+
 - (void)setCustomBackgroundColor:(NSString *)colorHex {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:colorHex forKey:USER_DEFAULTS_KEY];
     [defaults synchronize];
     
     // 刷新界面以应用新的背景颜色
-    self.view.backgroundColor = [self fetchBackgroundColorFromDefaults];
-}
-
-// 处理输入事件：滑行输入的检测
-- (void)handleInput:(UIEvent *)event {
-    if ([event type] == UIEventTypeTouches) {
-        NSSet *touches = [event allTouches];  // 使用 allTouches 获取触摸事件
-        
-        // 检查是否有触摸事件
-        if (touches.count > 0) {
-            NSLog(@"[SwipeInputTweak] 滑行输入事件 detected");
-            // 在此处加入滑行输入的处理逻辑
-        }
-    } else {
-        %orig;  // 调用原始的输入事件处理
-    }
+    self.view.backgroundColor = fetchBackgroundColorFromDefaults();
 }
 
 %end
