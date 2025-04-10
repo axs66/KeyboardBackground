@@ -58,6 +58,18 @@ jobs:
       - name: List generated DEBs
         run: ls -lh ${{ github.workspace }}/packages  # 列出构建生成的 .deb 包
 
+      - name: Check if Release exists
+        id: check_release
+        run: |
+          # 检查是否已经存在该版本的 GitHub Release
+          RELEASE_EXISTS=$(gh release view $NEW_VERSION --json name --jq ".name" || echo "not found")
+          if [ "$RELEASE_EXISTS" == "$NEW_VERSION" ]; then
+            echo "Release $NEW_VERSION already exists."
+            exit 1  # 如果 Release 已经存在，则终止工作流
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}  # 使用 GitHub Token 来授权查看和创建 Release
+
       - name: Create GitHub Release
         run: |
           # 使用新生成的版本号创建 GitHub Release
