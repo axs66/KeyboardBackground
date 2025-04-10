@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
+// 让 NineGridKeyboard 继承自 UIInputViewController
 @interface NineGridKeyboard : UIInputViewController
 @property (nonatomic, strong) UIView *nineGridView; // 九宫格视图
 @property (nonatomic, strong) UIColor *backgroundColor; // 键盘背景颜色
@@ -58,7 +59,9 @@
 // 按钮点击事件
 - (void)buttonTapped:(UIButton *)sender {
     NSString *character = [NSString stringWithFormat:@"%@", sender.titleLabel.text];
-    [self insertText:character]; // 将点击的字符插入到输入框中
+    
+    // 使用 UIInputViewController 的 insertText 方法来插入文本
+    [self.inputViewController insertText:character];
 }
 
 // 处理滑行输入的手势
