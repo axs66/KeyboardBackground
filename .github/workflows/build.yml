@@ -1,54 +1,73 @@
-name: CI  # 设置工作流名称为 CI
+name: CI
 
-# 仅当 build.yml 文件发生变化时触发工作流
 on:
   push:
     paths:
-      - '.github/workflows/build.yml'  # 仅在 build.yml 文件发生变化时触发
+      - '.github/workflows/build.yml'  # 仅当 build.yml 文件发生变化时触发工作流
     branches:
-      - 'main'  # 可以根据需求指定触发的分支
+      - 'main'  # 指定触发的分支，可以根据需要更改为其他分支
 
 jobs:
   build:
-    # 设置运行环境为 macOS，确保可以使用 Theos 和其他构建工具
-    runs-on: macos-latest
+    runs-on: macos-latest  # 指定工作流运行的操作系统为 macOS
 
     steps:
-      # 第一步：Checkout 代码
-      - name: Checkout code  # 这个步骤用于从 GitHub 仓库中拉取代码
-        uses: actions/checkout@v3  # 使用 GitHub 官方的 checkout Action
+      - name: Checkout code
+        uses: actions/checkout@v3  # 检出代码
         with:
-          submodules: true  # 确保拉取子模块（如果有）
+          submodules: true  # 检出子模块
 
-      # 第二步：使用 Theos Setup Action 设置 Theos 环境
-      - name: Use Theos Setup Action  # 使用预设的 Theos 环境配置 Action
-        uses: axs66/theos-action@main  # 使用 axs66/theos-action 的最新版本
-
-      # 第三步：清理之前生成的 .deb 包
-      - name: Clean previous packages  # 这一步会删除上一次生成的 .deb 文件，以便生成新的包
-        run: rm -f ${{ github.workspace }}/packages/*.deb  # 删除 `packages` 文件夹下的所有 .deb 文件
-
-      # 第四步：构建 .deb 包
-      - name: Build DEB (rootless + roothide)  # 在这个步骤中，构建 .deb 包，并为 rootless 和 roothide 配置包
+      - name: Get current version
+        id: get_version
         run: |
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless  # 使用 rootless 模式构建 .deb 包
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide  # 使用 roothide 模式构建 .deb 包
+          # 获取所有 Git 标签并按版本号排序，提取最后一个标签作为当前版本
+          VERSION=$(git tag -l | sort -V | tail -n 1)
+          
+          # 如果没有找到任何版本标签，默认版本号为 0.0.1
+          if [ -z "$VERSION" ]; then
+            VERSION="0.0.1"
+          fi
+          
+          # 解析版本号（MAJOR.MINOR.PATCH）
+          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
+          PATCH=${VERSION_PARTS[2]}  # 提取 PATCH 部分
+          MINOR=${VERSION_PARTS[1]}  # 提取 MINOR 部分
+          MAJOR=${VERSION_PARTS[0]}  # 提取 MAJOR 部分
+          
+          # 增加 PATCH 部分的值
+          PATCH=$((PATCH + 1))
+          
+          # 格式化新的版本号（MAJOR.MINOR.PATCH）
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          
+          # 将新版本号保存到 GitHub 环境变量，以供后续步骤使用
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-      # 第五步：列出生成的 .deb 包
-      - name: List generated DEBs  # 这个步骤列出生成的 .deb 包，方便确认包是否生成成功
-        run: ls -lh ${{ github.workspace }}/packages  # 显示 `packages` 文件夹中所有 .deb 包的详细信息
+      - name: Use Theos Setup Action
+        uses: axs66/theos-action@main  # 使用 Theos 设置操作，确保构建环境已配置好
 
-      # 第六步：创建 GitHub Release 并上传 .deb 包
-      - name: Create GitHub Release  # 这个步骤会创建一个 GitHub Release，并上传所有的 .deb 包
+      - name: Clean previous packages
+        run: rm -f ${{ github.workspace }}/packages/*.deb  # 删除之前生成的 .deb 包，确保清理干净
+
+      - name: Build DEB (rootless + roothide)
         run: |
-          VERSION=0.0.2  # 设定版本号为 0.0.2
-          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "SwipeInputTweak $VERSION" --notes "自动构建 .deb 安装包"  # 使用 `gh` 命令创建 GitHub Release，并附带标题和更新日志
+          # 构建 rootless 和 roothide 版本的 .deb 包
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
+
+      - name: List generated DEBs
+        run: ls -lh ${{ github.workspace }}/packages  # 列出构建生成的 .deb 包
+
+      - name: Create GitHub Release
+        run: |
+          # 使用新生成的版本号创建 GitHub Release
+          VERSION=$NEW_VERSION
+          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "SwipeInputTweak $VERSION" --notes "自动构建 .deb 安装包"
         env:
-          GH_TOKEN: ${{ secrets.PAT }}  # 使用 GitHub 的 Personal Access Token 进行授权
+          GH_TOKEN: ${{ secrets.PAT }}  # 使用 GitHub Token 来授权发布 Release
 
-      # 第七步：将生成的 .deb 包上传到工作流工件中
-      - name: Upload DEB to workflow artifacts  # 这个步骤会将构建好的 .deb 包上传到工作流工件，方便之后下载
-        uses: actions/upload-artifact@v4.3.3  # 使用 GitHub 官方的 upload-artifact Action
+      - name: Upload DEB to workflow artifacts
+        uses: actions/upload-artifact@v4.3.3  # 上传构建的 .deb 包到工作流的工件中，方便后续下载
         with:
-          name: SwipeInputTweak  # 设置工件名称为 SwipeInputTweak
-          path: ${{ github.workspace }}/packages/*.deb  # 指定上传的文件路径为 `packages` 文件夹中的所有 .deb 文件
+          name: SwipeInputTweak
+          path: ${{ github.workspace }}/packages/*.deb
