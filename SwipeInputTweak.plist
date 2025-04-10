@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Filter</key>
+    <dict>
+        <key>Bundles</key>
+        <array>
+            <string>com.apple.Preferences</string>  <!-- 系统设置 -->
+            <string>com.apple.springboard</string>  <!-- SpringBoard -->
+            <string>com.apple.UIKit</string>        <!-- UIKit -->
+        </array>
+    </dict>
+    <key>Executable</key>
+    <string>SwipeInputTweak</string>  <!-- 插件的名称 -->
+</dict>
+</plist>
