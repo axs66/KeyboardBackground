@@ -50,7 +50,7 @@
 // 处理输入事件：滑行输入的检测
 - (void)handleInput:(UIEvent *)event {
     if ([event type] == UIEventTypeTouches) {
-        NSSet *touches = [event touchesForGestureRecognizer:nil];
+        NSSet *touches = [event allTouches];  // 使用 allTouches 获取触摸事件
         
         // 检查是否有触摸事件
         if (touches.count > 0) {
