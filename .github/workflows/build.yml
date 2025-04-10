@@ -1,7 +1,3 @@
-name: CI
-
-on: [push]
-
 jobs:
   build:
     runs-on: macos-latest
@@ -18,10 +14,15 @@ jobs:
       - name: Clean previous packages
         run: rm -f ${{ github.workspace }}/packages/*.deb
 
-      - name: Build DEB (rootless + roothide)
-        run: |
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
+      # Parallelizing the build process
+      - name: Build rootless DEB
+        run: make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless &
+        
+      - name: Build roothide DEB
+        run: make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide &
+
+      - name: Wait for builds to finish
+        run: wait
 
       - name: List generated DEBs
         run: ls -lh ${{ github.workspace }}/packages
