@@ -6,7 +6,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = SwipeInputTweak
 
-SwipeInputTweak_FILES = Tweak.x
+SwipeInputTweak_FILES = Tweak.xm
 SwipeInputTweak_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
