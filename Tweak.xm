@@ -1,5 +1,18 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import "Common.h"
+
+%hook UIInputViewController
+
+- (void)viewDidLoad {
+    %orig;
+    
+    UIColor *bgColor = fetchBackgroundColorFromDefaults();
+    self.view.backgroundColor = bgColor;
+}
+
+%end
+
 
 #define USER_DEFAULTS_KEY @"SwipeInputTweakBackgroundColor"
 
@@ -64,6 +77,17 @@ UIColor *fetchBackgroundColorFromDefaults() {
     
     // 刷新界面以应用新的背景颜色
     self.view.backgroundColor = fetchBackgroundColorFromDefaults();
+}
+
+%end
+
+%hook UIInputViewController
+
+- (void)viewDidLoad {
+    %orig;
+    
+    UIColor *bgColor = fetchBackgroundColorFromDefaults();
+    self.view.backgroundColor = bgColor;
 }
 
 %end
