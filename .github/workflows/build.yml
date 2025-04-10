@@ -28,7 +28,7 @@ jobs:
 
       - name: Create GitHub Release
         run: |
-          VERSION=$(date +v%Y%m%d%H%M)
+          VERSION=0.0.1
           gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "SwipeInputTweak $VERSION" --notes "自动构建 .deb 安装包"
         env:
           GH_TOKEN: ${{ secrets.PAT }}
