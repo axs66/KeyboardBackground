@@ -21,16 +21,16 @@
     }
 }
 
-// 处理输入文本
+// 处理九宫格滑行输入
 - (void)insertText:(NSString *)text {
     id<UITextDocumentProxy> proxy = self.inputViewController.textDocumentProxy;
-    
+
     if (proxy) {
         [proxy insertText:text];
     }
 }
 
-// 其他插入文本的代码
+// 处理自定义输入的文本
 - (void)handleInput:(NSString *)character {
     id<UITextDocumentProxy> proxy = self.inputViewController.textDocumentProxy;
     if ([proxy respondsToSelector:@selector(insertText:)]) {
