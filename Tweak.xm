@@ -3,9 +3,10 @@
 
 #define USER_DEFAULTS_KEY @"SwipeInputTweakBackgroundColor"
 
+// 插件的主要钩子：UIInputViewController
 %hook UIInputViewController
 
-// 修改键盘背景颜色为用户自定义颜色
+// viewDidLoad：修改键盘背景颜色为用户自定义颜色
 - (void)viewDidLoad {
     %orig;
     
@@ -36,24 +37,7 @@
                            alpha:1.0];
 }
 
-// 拦截输入事件并处理滑行输入
-- (void)handleInput:(UIEvent *)event {
-    if ([event type] == UIEventTypeTouches) {
-        // 检查滑行输入的触摸事件
-        NSSet *touches = [event touchesForGestureRecognizer:nil];
-        
-        // 如果检测到滑行输入事件
-        if (touches.count > 0) {
-            NSLog(@"[SwipeInputTweak] 滑行输入事件 detected");
-            // 在此可以加入滑行输入的处理逻辑
-        }
-    } else {
-        // 其他事件使用原始处理逻辑
-        %orig;
-    }
-}
-
-// 提供一个方法来更改背景颜色
+// 自定义背景颜色设置方法
 - (void)setCustomBackgroundColor:(NSString *)colorHex {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:colorHex forKey:USER_DEFAULTS_KEY];
@@ -61,6 +45,21 @@
     
     // 刷新界面以应用新的背景颜色
     self.view.backgroundColor = [self fetchBackgroundColorFromDefaults];
+}
+
+// 处理输入事件：滑行输入的检测
+- (void)handleInput:(UIEvent *)event {
+    if ([event type] == UIEventTypeTouches) {
+        NSSet *touches = [event touchesForGestureRecognizer:nil];
+        
+        // 检查是否有触摸事件
+        if (touches.count > 0) {
+            NSLog(@"[SwipeInputTweak] 滑行输入事件 detected");
+            // 在此处加入滑行输入的处理逻辑
+        }
+    } else {
+        %orig;  // 调用原始的输入事件处理
+    }
 }
 
 %end
