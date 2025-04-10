@@ -1,9 +1,9 @@
-Package: com.yourid.swipeinputtweak
+Package: com.axs.swipeinputtweak
 Name: SwipeInputTweak
 Version: 0.0.1
 Architecture: iphoneos-arm
 Description: Enable glide/swipe typing on iOS 16
-Maintainer: yourname
-Author: yourname
+Maintainer: Axs
+Author:  Axs
 Section: Tweaks
 Depends: firmware (>= 16.0), ellekit
