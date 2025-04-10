@@ -1,6 +1,6 @@
-# SwipeInputTweak
+# KeyboardBackground
 
-一款在 iOS 16 无根越狱下激活滑行输入的插件，适用于 TrollStore + ElleKit 环境。
+一款在 iOS 16 无根越狱下原生键盘背景自定义。
 
 ## 安装方式
 
