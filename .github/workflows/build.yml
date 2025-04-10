@@ -3,9 +3,10 @@ name: CI
 on:
   push:
     paths:
-      - '.github/workflows/build.yml'  # 仅当 build.yml 文件发生变化时触发工作流
+      - '.github/workflows/build.yml'  # 监控 build.yml 文件的变化
+      - 'Tweak.xm'  # 增加对 Tweak.xm 文件的监控
     branches:
-      - 'main'  # 指定触发的分支，可以根据需要更改为其他分支
+      - 'main'  # 仅在推送到 main 分支时触发
 
 jobs:
   build:
