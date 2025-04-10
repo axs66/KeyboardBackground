@@ -37,8 +37,15 @@ UIColor* fetchBackgroundColorFromDefaults() {
 
 // 自定义颜色设置功能（如果需要）
 - (void)setCustomBackgroundColor:(UIColor *)color {
-    // 将颜色存储到 UserDefaults 中
-    [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%.0f,%.0f,%.0f", color.redComponent * 255, color.greenComponent * 255, color.blueComponent * 255] forKey:@"backgroundColor"];
+    // 将UIColor转换为CIColor，提取RGB组件
+    CIColor *ciColor = [CIColor colorWithCGColor:color.CGColor];
+    CGFloat red = ciColor.red * 255.0;
+    CGFloat green = ciColor.green * 255.0;
+    CGFloat blue = ciColor.blue * 255.0;
+    
+    // 将RGB组件存储到 UserDefaults 中
+    NSString *colorString = [NSString stringWithFormat:@"%.0f,%.0f,%.0f", red, green, blue];
+    [[NSUserDefaults standardUserDefaults] setObject:colorString forKey:@"backgroundColor"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
