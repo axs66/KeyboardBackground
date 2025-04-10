@@ -20,21 +20,21 @@ jobs:
       - name: Get current version
         id: get_version
         run: |
-          # 获取所有 Git 标签并按版本号排序，提取最后一个标签作为当前版本
+          # 获取当前最新的 Git 标签（版本号），默认从 0.0.1 开始
           VERSION=$(git tag -l | sort -V | tail -n 1)
-          
+
           # 如果没有找到任何版本标签，默认版本号为 0.0.1
           if [ -z "$VERSION" ]; then
             VERSION="0.0.1"
           fi
-          
+
           # 解析版本号（MAJOR.MINOR.PATCH）
           IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
           PATCH=${VERSION_PARTS[2]}  # 提取 PATCH 部分
           MINOR=${VERSION_PARTS[1]}  # 提取 MINOR 部分
           MAJOR=${VERSION_PARTS[0]}  # 提取 MAJOR 部分
           
-          # 增加 PATCH 部分的值
+          # 增加 PATCH 部分的值（递增 0.01）
           PATCH=$((PATCH + 1))
           
           # 格式化新的版本号（MAJOR.MINOR.PATCH）
