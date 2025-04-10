@@ -7,42 +7,33 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
         with:
           submodules: true
 
-      - name: Check cache
-        run: |
-          echo upstream_heads=theos_version_commit-sdks_version_commit >> $GITHUB_ENV
-
-      - name: Use cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}/theos
-          key: ${{ runner.os }}-theos-sdk-version
-
-      - name: Prepare Theos
+      - name: Use Theos Setup Action
         uses: axs66/theos-action@main
 
-      - name: Build package
+      - name: Clean previous packages
+        run: rm -f ${{ github.workspace }}/packages/*.deb
+
+      - name: Build DEB (rootless + roothide)
         run: |
-          rm -f ${{ github.workspace }}/packages/*.deb
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
 
-      - name: List generated Deb packages
-        run: ls ${{ github.workspace }}/packages
+      - name: List generated DEBs
+        run: ls -lh ${{ github.workspace }}/packages
 
       - name: Create GitHub Release
-        id: release
         run: |
-          VERSION=V0.0.1
-          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "SwipeInputTweak $VERSION" --notes "Automated release of .deb files"
+          VERSION=$(date +v%Y%m%d%H%M)
+          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "SwipeInputTweak $VERSION" --notes "自动构建 .deb 安装包"
         env:
-          GH_TOKEN: ${{ secrets.PAT }}  # 这里设置了 GitHub Token 用于授权
+          GH_TOKEN: ${{ secrets.PAT }}
 
-      - name: Upload specific Deb packages
+      - name: Upload DEB to workflow artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
           name: SwipeInputTweak
