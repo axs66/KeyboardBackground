@@ -1,8 +1,8 @@
-Package: com.axs.swipeinputtweak
-Name: SwipeInputTweak
-Version: 0.0.2
+Package: com.axs.KeyboardBackground
+Name: KeyboardBackground
+Version: 0.0.1
 Architecture: iphoneos-arm
-Description: Enable glide/swipe typing on iOS 16
+Description: KeyboardBackgroundTweak on iOS 16
 Maintainer: Axs
 Author:  Axs
 Section: Tweaks
