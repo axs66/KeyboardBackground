@@ -1,5 +1,6 @@
 name: CI
 
+# 仅当 build.yml 文件发生变化时触发工作流
 on:
   push:
     paths:
@@ -10,77 +11,37 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest  # 指定工作流运行的操作系统为 macOS
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # 检出代码
+        uses: actions/checkout@v3
         with:
-          submodules: true  # 检出子模块
-
-      - name: Get current version
-        id: get_version
-        run: |
-          # 获取当前最新的 Git 标签（版本号），默认从 0.0.1 开始
-          VERSION=$(git tag -l | sort -V | tail -n 1)
-
-          # 如果没有找到任何版本标签，默认版本号为 0.0.1
-          if [ -z "$VERSION" ]; then
-            VERSION="0.0.1"
-          fi
-
-          # 解析版本号（MAJOR.MINOR.PATCH）
-          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
-          PATCH=${VERSION_PARTS[2]}  # 提取 PATCH 部分
-          MINOR=${VERSION_PARTS[1]}  # 提取 MINOR 部分
-          MAJOR=${VERSION_PARTS[0]}  # 提取 MAJOR 部分
-          
-          # 增加 PATCH 部分的值（递增 0.01）
-          PATCH=$((PATCH + 1))
-          
-          # 格式化新的版本号（MAJOR.MINOR.PATCH）
-          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-          
-          # 将新版本号保存到 GitHub 环境变量，以供后续步骤使用
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          submodules: true
 
       - name: Use Theos Setup Action
-        uses: axs66/theos-action@main  # 使用 Theos 设置操作，确保构建环境已配置好
+        uses: axs66/theos-action@main
 
       - name: Clean previous packages
-        run: rm -f ${{ github.workspace }}/packages/*.deb  # 删除之前生成的 .deb 包，确保清理干净
+        run: rm -f ${{ github.workspace }}/packages/*.deb
 
       - name: Build DEB (rootless + roothide)
         run: |
-          # 构建 rootless 和 roothide 版本的 .deb 包
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
 
       - name: List generated DEBs
-        run: ls -lh ${{ github.workspace }}/packages  # 列出构建生成的 .deb 包
-
-      - name: Check if Release exists
-        id: check_release
-        run: |
-          # 检查是否已经存在该版本的 GitHub Release
-          RELEASE_EXISTS=$(gh release view $NEW_VERSION --json name --jq ".name" || echo "not found")
-          if [ "$RELEASE_EXISTS" == "$NEW_VERSION" ]; then
-            echo "Release $NEW_VERSION already exists."
-            exit 1  # 如果 Release 已经存在，则终止工作流
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}  # 使用 GitHub Token 来授权查看和创建 Release
+        run: ls -lh ${{ github.workspace }}/packages
 
       - name: Create GitHub Release
         run: |
-          # 使用新生成的版本号创建 GitHub Release
-          VERSION=$NEW_VERSION
+          VERSION=$(date +v%Y%m%d%H%M)
           gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "SwipeInputTweak $VERSION" --notes "自动构建 .deb 安装包"
         env:
-          GH_TOKEN: ${{ secrets.PAT }}  # 使用 GitHub Token 来授权发布 Release
+          GH_TOKEN: ${{ secrets.PAT }}
 
       - name: Upload DEB to workflow artifacts
-        uses: actions/upload-artifact@v4.3.3  # 上传构建的 .deb 包到工作流的工件中，方便后续下载
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: SwipeInputTweak
           path: ${{ github.workspace }}/packages/*.deb
