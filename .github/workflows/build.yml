@@ -18,30 +18,14 @@ jobs:
       - name: Clean previous packages
         run: rm -f ${{ github.workspace }}/packages/*.deb
 
-      # 使用缓存加速依赖下载
-      - name: Cache Theos dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.theos
-          key: ${{ runner.os }}-theos-${{ hashFiles('**/*.m') }}
-          restore-keys: |
-            ${{ runner.os }}-theos-
+      - name: Build DEB (rootless + roothide)
+        run: |
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
 
-      # 并行化构建 rootless 和 roothide
-      - name: Build rootless DEB
-        run: make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless &
-        
-      - name: Build roothide DEB
-        run: make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide &
-
-      - name: Wait for builds to finish
-        run: wait
-
-      # 查看生成的 DEB 文件
       - name: List generated DEBs
         run: ls -lh ${{ github.workspace }}/packages
 
-      # 创建 GitHub Release
       - name: Create GitHub Release
         run: |
           VERSION=0.0.1
@@ -49,12 +33,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT }}
 
-      # 上传 DEB 包到工作流附件
-      - name: Compress DEBs before upload
-        run: tar -czvf debs.tar.gz ${{ github.workspace }}/packages/*.deb
-
       - name: Upload DEB to workflow artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
           name: SwipeInputTweak
-          path: debs.tar.gz
+          path: ${{ github.workspace }}/packages/*.deb
