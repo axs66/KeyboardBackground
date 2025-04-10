@@ -13,17 +13,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up Theos Toolchain (via docker)
-      uses: actions/setup-python@v4
-
-    - name: Build DEB Package (Mock Step)
+    - name: Set up Docker
       run: |
-        mkdir -p packages
-        echo "Pretend this is a .deb package" > packages/SwipeInputTweak.deb
+        docker pull ghcr.io/theos/theos:latest
 
-    - name: Upload Release
+    - name: Build DEB using Theos Docker
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/theos -w /theos           -e THEOS=/theos/theos           ghcr.io/theos/theos:latest           make clean package FINALPACKAGE=1
+
+    - name: Upload DEB to Release
       uses: softprops/action-gh-release@v1
       with:
-        files: packages/SwipeInputTweak.deb
+        files: packages/*.deb
       env:
         GITHUB_TOKEN: ${{ secrets.PAT }}
