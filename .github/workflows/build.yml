@@ -1,1 +1,29 @@
+name: Build and Release DEB
 
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Theos Toolchain (via docker)
+      uses: actions/setup-python@v4
+
+    - name: Build DEB Package (Mock Step)
+      run: |
+        mkdir -p packages
+        echo "Pretend this is a .deb package" > packages/SwipeInputTweak.deb
+
+    - name: Upload Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: packages/SwipeInputTweak.deb
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
