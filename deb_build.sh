@@ -2,7 +2,7 @@
 set -e
 
 THEOS=~/theos
-PACKAGE_ID="com.yourid.swipeinputtweak"
+PACKAGE_ID="com.axs.swipeinputtweak"
 DEB_NAME="SwipeInputTweak.deb"
 
 echo "[*] Cleaning..."
