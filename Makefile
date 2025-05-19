@@ -1,22 +1,25 @@
+ARCHS = arm64 arm64e
 TARGET := iphone:clang:latest:14.5
 INSTALL_TARGET_PROCESSES = SpringBoard
 
-THEOS_PACKAGE_SCHEME = rootless  # Dopamine越狱保留，否则删除
+THEOS_PACKAGE_SCHEME = rootless  # 适用于Dopamine等rootless越狱
 
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = KeyboardTheme
 KeyboardTheme_FILES = Tweak.xm
 KeyboardTheme_FRAMEWORKS = UIKit
+KeyboardTheme_CFLAGS = -fobjc-arc
 
-# 指定filter plist，告诉Theos哪些进程注入tweak
+# 过滤器plist路径（确保文件存在）
 KeyboardTheme_FILTERS = plist/KeyboardTheme.plist
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-# 安装纯plist偏好设置文件到系统设置界面（不编译bundle）
-KeyboardTheme_INSTALL_PATH = /Library/PreferenceLoader/Preferences/KeyboardTheme.plist
-KeyboardTheme_EXTRA_INSTALL_FILES = layout/Library/PreferenceLoader/Preferences/KeyboardTheme.plist
+# 额外安装文件
+KeyboardTheme_EXTRA_INSTALL_FILES += \
+    Resources/keyboard_bg.png \
+    PreferenceLoader/Preferences/KeyboardTheme.plist
 
 after-install::
 	install.exec "killall -9 SpringBoard"
