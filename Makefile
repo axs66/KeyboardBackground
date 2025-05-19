@@ -8,10 +8,10 @@ TARGET_CODESIGN = ldid
 
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = KeyboardThemeTweak
+TWEAK_NAME = KeyboardTheme
 
-KeyboardThemeTweak_FILES = Tweak.xm
-KeyboardThemeTweak_FRAMEWORKS = UIKit Foundation
+KeyboardTheme_FILES = Tweak.xm
+KeyboardTheme_FRAMEWORKS = UIKit Foundation
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
