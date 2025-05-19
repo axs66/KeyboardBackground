@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>title</key>
+    <string>键盘背景设置</string>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>颜色设置</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>label</key>
+            <string>背景颜色（R,G,B）</string>
+            <key>key</key>
+            <string>backgroundColor</string>
+            <key>default</key>
+            <string>255,255,255</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>说明</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSStaticTextCell</string>
+            <key>label</key>
+            <string>图片路径：/Library/KeyboardThemeTweak/keyboard_bg.png\n优先使用图片</string>
+        </dict>
+    </array>
+</dict>
+</plist>
