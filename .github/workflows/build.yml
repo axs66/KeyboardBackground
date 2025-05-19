@@ -28,7 +28,6 @@ jobs:
         run: |
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
-        working-directory: ./KeyboardTheme  # ✅ 添加此行
 
       - name: List generated DEBs
         run: ls -lh ${{ github.workspace }}/packages
