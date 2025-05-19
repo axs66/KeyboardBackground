@@ -1,8 +1,7 @@
-// 引入 UIKit 框架，确保可以访问 UIView、UIImage、UIColor 等属性与方法
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-// 从偏好设置中读取用户设置的背景颜色（格式为 "255,255,255"）
+#pragma mark - 工具方法：获取用户设置的背景颜色
 UIColor* fetchBackgroundColorFromDefaults() {
     NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.yourname.keyboardtheme.plist"];
     NSString *colorString = prefs[@"backgroundColor"];
@@ -16,160 +15,172 @@ UIColor* fetchBackgroundColorFromDefaults() {
             return [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
         }
     }
-    // 默认白色背景
     return [UIColor whiteColor];
 }
 
-// =================== UIKBVisualEffectView 背景替换 ===================
-%hook UIKBVisualEffectView
+#pragma mark - 工具方法：设置自定义颜色（用于调试或设置工具）
+void setCustomBackgroundColor(UIColor *color) {
+    CIColor *ciColor = [CIColor colorWithCGColor:color.CGColor];
+    CGFloat red = ciColor.red * 255.0;
+    CGFloat green = ciColor.green * 255.0;
+    CGFloat blue = ciColor.blue * 255.0;
 
+    NSString *colorString = [NSString stringWithFormat:@"%.0f,%.0f,%.0f", red, green, blue];
+    [[NSUserDefaults standardUserDefaults] setObject:colorString forKey:@"backgroundColor"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - 主键盘模糊背景替换
+%hook UIKBVisualEffectView
 - (void)layoutSubviews {
     %orig;
+    NSLog(@"[KeyboardTheme] UIKBVisualEffectView layoutSubviews");
 
-    NSLog(@"[KeyboardTheme] UIKBVisualEffectView layoutSubviews hook");
-
-    // 移除模糊背景效果
+    // 关闭系统模糊效果（安全做法，避免 undefined method）
     if ([self respondsToSelector:@selector(setEffect:)]) {
         [self performSelector:@selector(setEffect:) withObject:nil];
     }
 
-    // 避免重复添加背景视图
+    // 添加背景图或颜色，仅添加一次
     if (![self viewWithTag:9527]) {
-        // 新建背景视图，填满整个键盘背景
-        UIView *bgView = [[UIView alloc] initWithFrame:self.bounds];
+        CGRect frame = [(UIView *)self frame]; // 安全获取 frame
+        UIView *bgView = [[UIView alloc] initWithFrame:frame];
         bgView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         bgView.tag = 9527;
 
-        // 尝试加载图片背景
+        // 优先加载背景图
         UIImage *bgImage = [UIImage imageWithContentsOfFile:@"/Library/KeyboardTheme/keyboard_bg.png"];
         if (bgImage) {
             UIImageView *bgImageView = [[UIImageView alloc] initWithImage:bgImage];
             bgImageView.contentMode = UIViewContentModeScaleAspectFill;
-            bgImageView.frame = self.bounds;
+            bgImageView.frame = frame;
             bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             [bgView addSubview:bgImageView];
         } else {
-            // 如果没图片，则使用用户设置颜色
+            // 无图时使用背景色
             bgView.backgroundColor = fetchBackgroundColorFromDefaults();
         }
 
-        // 添加到键盘背景视图中
         [self addSubview:bgView];
         [self sendSubviewToBack:bgView];
     }
 }
-
 %end
 
-// =================== 设置键盘控制器背景色 ===================
+#pragma mark - 设置整个输入视图的默认背景颜色
 %hook UIInputViewController
-
 - (void)viewDidLoad {
     %orig;
+    NSLog(@"[KeyboardTheme] UIInputViewController viewDidLoad");
 
     UIColor *bgColor = fetchBackgroundColorFromDefaults();
     self.view.backgroundColor = bgColor;
 
-    // 给子视图统一设置背景色
     for (UIView *subview in self.view.subviews) {
         subview.backgroundColor = bgColor;
     }
-
-    NSLog(@"[KeyboardTheme] UIInputViewController viewDidLoad hook, set background color");
 }
-
 %end
 
-// =================== 键盘渲染相关 hook（用于调试观察） ===================
+#pragma mark - 常用键盘视图 layoutSubviews 调试 Hook
+
 %hook UIKBKeyView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardHook] UIKBKeyView layoutSubviews");
+    NSLog(@"[KeyboardTheme] UIKBKeyView layoutSubviews");
 }
 %end
 
 %hook UIKBKeyBackgroundView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardHook] UIKBKeyBackgroundView layoutSubviews");
+    NSLog(@"[KeyboardTheme] UIKBKeyBackgroundView layoutSubviews");
 }
 %end
 
 %hook UIKBBackdropView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardHook] UIKBBackdropView layoutSubviews");
+    NSLog(@"[KeyboardTheme] UIKBBackdropView layoutSubviews");
 }
 %end
 
 %hook UIInputView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardHook] UIInputView layoutSubviews");
-}
-%end
-
-%hook UIKeyboardCandidateViewStyle
-- (id)arrowButtonBackgroundColor {
-    id color = %orig;
-    NSLog(@"[KeyboardHook] arrowButtonBackgroundColor: %@", color);
-    return color;
-}
-
-- (id)gridBackgroundColor {
-    id color = %orig;
-    NSLog(@"[KeyboardHook] gridBackgroundColor: %@", color);
-    return color;
-}
-
-- (id)highlightedBackgroundColor {
-    id color = %orig;
-    NSLog(@"[KeyboardHook] highlightedBackgroundColor: %@", color);
-    return color;
-}
-
-- (id)highlightedTextColor {
-    id color = %orig;
-    NSLog(@"[KeyboardHook] highlightedTextColor: %@", color);
-    return color;
-}
-
-- (id)lineColor {
-    id color = %orig;
-    NSLog(@"[KeyboardHook] lineColor: %@", color);
-    return color;
-}
-
-- (id)arrowButtonSeparatorImage {
-    id image = %orig;
-    NSLog(@"[KeyboardHook] arrowButtonSeparatorImage: %@", image);
-    return image;
-}
-%end
-
-%hook UIKBRenderConfig
-- (void)setKeyBackgroundType:(int)type {
-    %orig;
-    NSLog(@"[KeyboardHook] setKeyBackgroundType: %d", type);
-}
-
-- (void)setKeyBackgroundOpacity:(float)opacity {
-    %orig;
-    NSLog(@"[KeyboardHook] setKeyBackgroundOpacity: %f", opacity);
-}
-%end
-
-%hook UIPredictionViewController
-- (id)_currentTextSuggestions {
-    id suggestions = %orig;
-    NSLog(@"[KeyboardHook] _currentTextSuggestions: %@", suggestions);
-    return suggestions;
+    NSLog(@"[KeyboardTheme] UIInputView layoutSubviews");
 }
 %end
 
 %hook UIKeyboardDockView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardHook] UIKeyboardDockView layoutSubviews");
+    NSLog(@"[KeyboardTheme] UIKeyboardDockView layoutSubviews");
+}
+%end
+
+#pragma mark - 候选词栏样式调试 Hook
+
+%hook UIKeyboardCandidateViewStyle
+
+- (id)arrowButtonBackgroundColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] arrowButtonBackgroundColor: %@", color);
+    return color;
+}
+
+- (id)gridBackgroundColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] gridBackgroundColor: %@", color);
+    return color;
+}
+
+- (id)highlightedBackgroundColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] highlightedBackgroundColor: %@", color);
+    return color;
+}
+
+- (id)highlightedTextColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] highlightedTextColor: %@", color);
+    return color;
+}
+
+- (id)lineColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] lineColor: %@", color);
+    return color;
+}
+
+- (id)arrowButtonSeparatorImage {
+    id image = %orig;
+    NSLog(@"[KeyboardTheme] arrowButtonSeparatorImage: %@", image);
+    return image;
+}
+%end
+
+#pragma mark - 键盘渲染配置调试 Hook
+
+%hook UIKBRenderConfig
+
+- (void)setKeyBackgroundType:(int)type {
+    %orig;
+    NSLog(@"[KeyboardTheme] setKeyBackgroundType: %d", type);
+}
+
+- (void)setKeyBackgroundOpacity:(float)opacity {
+    %orig;
+    NSLog(@"[KeyboardTheme] setKeyBackgroundOpacity: %f", opacity);
+}
+%end
+
+#pragma mark - 候选词预测调试 Hook
+
+%hook UIPredictionViewController
+- (id)_currentTextSuggestions {
+    id suggestions = %orig;
+    NSLog(@"[KeyboardTheme] _currentTextSuggestions: %@", suggestions);
+    return suggestions;
 }
 %end
