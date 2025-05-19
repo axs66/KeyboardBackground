@@ -1,52 +1,84 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-// 获取自定义背景颜色的函数（从 UserDefaults 或其他地方）
 UIColor* fetchBackgroundColorFromDefaults() {
-    NSString *colorString = [[NSUserDefaults standardUserDefaults] objectForKey:@"backgroundColor"];
-    
+    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.yourname.keyboardtheme.plist"];
+    NSString *colorString = prefs[@"backgroundColor"];
+
     if (colorString) {
-        // 如果从 UserDefaults 获取到了颜色字符串（例如 "255,0,0"）
         NSArray *colorComponents = [colorString componentsSeparatedByString:@","];
-        CGFloat red = [colorComponents[0] floatValue] / 255.0;
-        CGFloat green = [colorComponents[1] floatValue] / 255.0;
-        CGFloat blue = [colorComponents[2] floatValue] / 255.0;
-        return [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
+        if (colorComponents.count == 3) {
+            CGFloat red = [colorComponents[0] floatValue] / 255.0;
+            CGFloat green = [colorComponents[1] floatValue] / 255.0;
+            CGFloat blue = [colorComponents[2] floatValue] / 255.0;
+            return [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
+        }
     }
-    // 如果没有保存颜色，则返回默认颜色（例如白色）
     return [UIColor whiteColor];
 }
 
-%hook UIInputViewController  // 钩取输入法控制器
-
-// 修改键盘背景颜色
-- (void)viewDidLoad {
-    %orig;
-    
-    // 获取自定义背景颜色
-    UIColor *bgColor = fetchBackgroundColorFromDefaults();
-    
-    // 确保背景颜色覆盖整个键盘区域
-    self.view.backgroundColor = bgColor;
-    
-    // 如果有其他子视图需要设置颜色，例如键盘区域的子视图，可以设置为同样的颜色
-    for (UIView *subview in self.view.subviews) {
-        subview.backgroundColor = bgColor;
-    }
-}
-
-// 自定义颜色设置功能（如果需要）
-- (void)setCustomBackgroundColor:(UIColor *)color {
-    // 将UIColor转换为CIColor，提取RGB组件
+// 自定义设置颜色并保存
+void setCustomBackgroundColor(UIColor *color) {
     CIColor *ciColor = [CIColor colorWithCGColor:color.CGColor];
     CGFloat red = ciColor.red * 255.0;
     CGFloat green = ciColor.green * 255.0;
     CGFloat blue = ciColor.blue * 255.0;
-    
-    // 将RGB组件存储到 UserDefaults 中
+
     NSString *colorString = [NSString stringWithFormat:@"%.0f,%.0f,%.0f", red, green, blue];
     [[NSUserDefaults standardUserDefaults] setObject:colorString forKey:@"backgroundColor"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+%hook UIKBVisualEffectView
+
+- (void)layoutSubviews {
+    %orig;
+
+    NSLog(@"[+] KeyboardThemeTweak: layoutSubviews hook");
+
+    // 关闭系统模糊效果
+    if ([self respondsToSelector:@selector(setEffect:)]) {
+        [self performSelector:@selector(setEffect:) withObject:nil];
+    }
+
+    // 添加背景图或背景色
+    if (![self viewWithTag:9527]) {
+        UIView *bgView = [[UIView alloc] initWithFrame:self.bounds];
+        bgView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        bgView.tag = 9527;
+
+        // 首先尝试加载背景图
+        UIImage *bgImage = [UIImage imageWithContentsOfFile:@"/Library/KeyboardThemeTweak/keyboard_bg.png"];
+        if (bgImage) {
+            UIImageView *bgImageView = [[UIImageView alloc] initWithImage:bgImage];
+            bgImageView.contentMode = UIViewContentModeScaleAspectFill;
+            bgImageView.frame = self.bounds;
+            bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            [bgView addSubview:bgImageView];
+        } else {
+            // 若无图片则使用用户设置的颜色
+            bgView.backgroundColor = fetchBackgroundColorFromDefaults();
+        }
+
+        [self addSubview:bgView];
+        [self sendSubviewToBack:bgView];
+    }
+}
+
+%end
+
+%hook UIInputViewController
+
+- (void)viewDidLoad {
+    %orig;
+
+    // 设置主控制器视图背景色（以防万一）
+    UIColor *bgColor = fetchBackgroundColorFromDefaults();
+    self.view.backgroundColor = bgColor;
+
+    for (UIView *subview in self.view.subviews) {
+        subview.backgroundColor = bgColor;
+    }
 }
 
 %end
