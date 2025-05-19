@@ -1,6 +1,6 @@
 Package: com.axs.keyboardtheme
 Name: KeyboardTheme
-Version: 1.0
+Version: 1.0.0
 Architecture: iphoneos-arm
 Description: 自定义原生输入法键盘背景（图片或颜色）
 Maintainer: Axs
