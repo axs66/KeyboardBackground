@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+    <dict>
+        <key>cell</key>
+        <string>PSGroupCell</string>
+        <key>label</key>
+        <string>背景颜色设置 (格式: R,G,B)</string>
+    </dict>
+    <dict>
+        <key>cell</key>
+        <string>PSEditTextCell</string>
+        <key>defaults</key>
+        <string>com.yourname.keyboardtheme</string>
+        <key>key</key>
+        <string>backgroundColor</string>
+        <key>label</key>
+        <string>背景颜色</string>
+    </dict>
+</array>
+</plist>
