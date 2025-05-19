@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" 
+   "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Filter</key>
+    <dict>
+        <key>Bundles</key>
+        <array>
+            <string>com.apple.keyboard</string>
+            <string>SpringBoard</string>
+            <string>UIKit</string>
+            <!-- 这里写你需要注入的进程 bundle id，通常原生键盘进程是 UIKit，或其它你需要hook的app -->
+        </array>
+    </dict>
+</dict>
+</plist>
