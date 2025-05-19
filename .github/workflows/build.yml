@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - '.github/workflows/build.yml'
-      - 'KeyboardTheme/**'  # ✅ 监控整个子目录变化
+      - 'Tweak.xm'
+      - 'control'
     branches:
       - 'main'
+  workflow_dispatch:  # 👉 允许手动触发
 
 jobs:
   build:
