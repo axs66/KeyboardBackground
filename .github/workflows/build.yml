@@ -1,14 +1,12 @@
 name: CI
 
-# 仅当 build.yml 文件发生变化时触发工作流
 on:
   push:
     paths:
-      - '.github/workflows/build.yml'  # 监控 build.yml 文件的变化
-      - 'Tweak.xm'  # 增加对 Tweak.xm 文件的监控
-      - 'control'
+      - '.github/workflows/build.yml'
+      - 'KeyboardTheme/**'  # ✅ 监控整个子目录变化
     branches:
-      - 'main'  # 仅在推送到 main 分支时触发
+      - 'main'
 
 jobs:
   build:
@@ -30,6 +28,7 @@ jobs:
         run: |
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
+        working-directory: ./KeyboardTheme  # ✅ 添加此行
 
       - name: List generated DEBs
         run: ls -lh ${{ github.workspace }}/packages
