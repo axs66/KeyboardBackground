@@ -1,60 +1,26 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-#pragma mark - 工具方法：获取用户设置的背景颜色
-// 从偏好设置文件读取用户自定义的RGB背景颜色，返回 UIColor 对象
-UIColor* fetchBackgroundColorFromDefaults() {
-    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.yourname.keyboardtheme.plist"];
-    NSString *colorString = prefs[@"backgroundColor"];
-
-    if (colorString) {
-        NSArray *colorComponents = [colorString componentsSeparatedByString:@","];
-        if (colorComponents.count == 3) {
-            CGFloat red = [colorComponents[0] floatValue] / 255.0;
-            CGFloat green = [colorComponents[1] floatValue] / 255.0;
-            CGFloat blue = [colorComponents[2] floatValue] / 255.0;
-            return [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
-        }
-    }
-    // 默认白色背景
-    return [UIColor whiteColor];
-}
-
-#pragma mark - 工具方法：保存自定义颜色（供调试或设置工具使用）
-// 将 UIColor 转为字符串并保存到 NSUserDefaults，方便偏好设置读取
-void setCustomBackgroundColor(UIColor *color) {
-    CIColor *ciColor = [CIColor colorWithCGColor:color.CGColor];
-    CGFloat red = ciColor.red * 255.0;
-    CGFloat green = ciColor.green * 255.0;
-    CGFloat blue = ciColor.blue * 255.0;
-
-    NSString *colorString = [NSString stringWithFormat:@"%.0f,%.0f,%.0f", red, green, blue];
-    [[NSUserDefaults standardUserDefaults] setObject:colorString forKey:@"backgroundColor"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-#pragma mark - 主要 Hook：替换键盘模糊背景视图
+#pragma mark - Hook: UIKBVisualEffectView，用于插入背景视图
 %hook UIKBVisualEffectView
+
 - (void)layoutSubviews {
     %orig;
     NSLog(@"[KeyboardTheme] UIKBVisualEffectView layoutSubviews");
 
-    // 关闭系统自带的模糊效果，防止背景遮挡
+    // 取消系统模糊背景效果
     if ([self respondsToSelector:@selector(setEffect:)]) {
         [self performSelector:@selector(setEffect:) withObject:nil];
     }
 
-    // 仅添加一次背景视图，避免重复添加导致性能问题
+    // 避免重复添加
     if (![self viewWithTag:9527]) {
-        // 采用安全的 frame 获取方式，防止闪退
-        CGRect frame = [(UIView *)self frame];
+        CGRect frame = self.bounds;
 
-        // 新建背景容器视图
         UIView *bgView = [[UIView alloc] initWithFrame:frame];
         bgView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         bgView.tag = 9527;
 
-        // 优先加载用户自定义背景图片
         UIImage *bgImage = [UIImage imageWithContentsOfFile:@"/Library/KeyboardTheme/keyboard_bg.png"];
         if (bgImage) {
             UIImageView *bgImageView = [[UIImageView alloc] initWithImage:bgImage];
@@ -63,8 +29,8 @@ void setCustomBackgroundColor(UIColor *color) {
             bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             [bgView addSubview:bgImageView];
         } else {
-            // 图片缺失时使用用户自定义背景色
-            bgView.backgroundColor = fetchBackgroundColorFromDefaults();
+            // 图片不存在时使用默认颜色（浅灰）
+            bgView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
         }
 
         [self addSubview:bgView];
@@ -73,35 +39,23 @@ void setCustomBackgroundColor(UIColor *color) {
 }
 %end
 
-#pragma mark - 输入视图控制器 Hook：设置整体背景色
+#pragma mark - Hook: UIInputViewController 设置主背景色（非必要，可选保留）
 %hook UIInputViewController
+
 - (void)viewDidLoad {
     %orig;
     NSLog(@"[KeyboardTheme] UIInputViewController viewDidLoad");
 
-    // 设置键盘整体背景颜色，确保所有子视图统一色调
-    UIColor *bgColor = fetchBackgroundColorFromDefaults();
-    self.view.backgroundColor = bgColor;
-
-    for (UIView *subview in self.view.subviews) {
-        subview.backgroundColor = bgColor;
-    }
+    // 可选：设置整个键盘控制器背景颜色（用于测试/一致性）
+    self.view.backgroundColor = [UIColor clearColor];
 }
 %end
 
-#pragma mark - 其它键盘视图 layoutSubviews Hook 用于调试
-// 这些Hook主要用于输出日志，方便调试键盘视图的生命周期
+#pragma mark - 其它调试 Hook（保留以供观察键盘生命周期）
 %hook UIKBKeyView
 - (void)layoutSubviews {
     %orig;
     NSLog(@"[KeyboardTheme] UIKBKeyView layoutSubviews");
-}
-%end
-
-%hook UIKBKeyBackgroundView
-- (void)layoutSubviews {
-    %orig;
-    NSLog(@"[KeyboardTheme] UIKBKeyBackgroundView layoutSubviews");
 }
 %end
 
@@ -126,7 +80,6 @@ void setCustomBackgroundColor(UIColor *color) {
 }
 %end
 
-#pragma mark - 候选词视图样式 Hook 用于调试和颜色调节
 %hook UIKeyboardCandidateViewStyle
 
 - (id)arrowButtonBackgroundColor {
@@ -166,7 +119,6 @@ void setCustomBackgroundColor(UIColor *color) {
 }
 %end
 
-#pragma mark - 键盘渲染配置 Hook 用于调试
 %hook UIKBRenderConfig
 
 - (void)setKeyBackgroundType:(int)type {
@@ -180,7 +132,6 @@ void setCustomBackgroundColor(UIColor *color) {
 }
 %end
 
-#pragma mark - 候选词预测 Hook
 %hook UIPredictionViewController
 - (id)_currentTextSuggestions {
     id suggestions = %orig;
