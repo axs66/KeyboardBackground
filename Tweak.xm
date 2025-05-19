@@ -1,105 +1,141 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-#define kThemeImagePath @"/var/jb/Library/KeyboardTheme/keyboard_bg.png"
-#define kThemeTag 20240601
-
-#pragma mark - 主键盘背景处理
+#pragma mark - Hook: UIKBVisualEffectView，用于插入背景视图
 %hook UIKBVisualEffectView
 
-- (void)didAddSubview:(UIView *)subview {
-    %orig;
-    [self applyCustomTheme];
-}
-
 - (void)layoutSubviews {
     %orig;
-    [self applyCustomTheme];
-}
+    NSLog(@"[KeyboardTheme] UIKBVisualEffectView layoutSubviews");
 
-- (void)applyCustomTheme {
-    // 移除系统模糊效果
+    // 取消系统模糊背景效果
     if ([self respondsToSelector:@selector(setEffect:)]) {
-        [self setEffect:nil];
+        [self performSelector:@selector(setEffect:) withObject:nil];
     }
-    
-    // 避免重复添加
-    UIView *existingView = [self viewWithTag:kThemeTag];
-    if (existingView) return;
-    
-    // 创建主题视图
-    UIView *themeView = [[UIView alloc] initWithFrame:self.bounds];
-    themeView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    themeView.tag = kThemeTag;
-    themeView.userInteractionEnabled = NO;
-    
-    // 加载自定义背景图
-    UIImage *bgImage = [UIImage imageWithContentsOfFile:kThemeImagePath];
-    if (bgImage) {
-        UIImageView *bgImageView = [[UIImageView alloc] initWithImage:bgImage];
-        bgImageView.contentMode = UIViewContentModeScaleAspectFill;
-        bgImageView.frame = themeView.bounds;
-        bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [themeView addSubview:bgImageView];
-    } else {
-        themeView.backgroundColor = [UIColor colorWithRed:0.96 green:0.96 blue:0.96 alpha:1.0];
-    }
-    
-    [self addSubview:themeView];
-    [self sendSubviewToBack:themeView];
-}
 
+    // 避免重复添加
+    if (![self viewWithTag:9527]) {
+        CGRect frame = ((UIView *)self).bounds;
+
+        UIView *bgView = [[UIView alloc] initWithFrame:frame];
+        bgView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        bgView.tag = 9527;
+
+        UIImage *bgImage = [UIImage imageWithContentsOfFile:@"/Library/KeyboardTheme/keyboard_bg.png"];
+        if (bgImage) {
+            UIImageView *bgImageView = [[UIImageView alloc] initWithImage:bgImage];
+            bgImageView.contentMode = UIViewContentModeScaleAspectFill;
+            bgImageView.frame = frame;
+            bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            [bgView addSubview:bgImageView];
+        } else {
+            // 图片不存在时使用默认颜色（浅灰）
+            bgView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+        }
+
+        [self addSubview:bgView];
+        [self sendSubviewToBack:bgView];
+    }
+}
 %end
 
-#pragma mark - 候选栏/预测栏处理
-%hook UIKeyboardPredictionView
+#pragma mark - Hook: UIInputViewController 设置主背景色（非必要，可选保留）
+%hook UIInputViewController
 
+- (void)viewDidLoad {
+    %orig;
+    NSLog(@"[KeyboardTheme] UIInputViewController viewDidLoad");
+
+    // 可选：设置整个键盘控制器背景颜色（用于测试/一致性）
+    self.view.backgroundColor = [UIColor clearColor];
+}
+%end
+
+#pragma mark - 其它调试 Hook（保留以供观察键盘生命周期）
+%hook UIKBKeyView
 - (void)layoutSubviews {
     %orig;
-    
-    // 移除候选栏背景模糊
-    for (UIView *subview in self.subviews) {
-        if ([subview isKindOfClass:%c(UIKBVisualEffectView)]) {
-            [(UIKBVisualEffectView *)subview setEffect:nil];
-        }
-    }
+    NSLog(@"[KeyboardTheme] UIKBKeyView layoutSubviews");
 }
-
 %end
 
-#pragma mark - 键盘扩展区域处理
-%hook UIInputSetHostView
-
-- (void)didMoveToWindow {
+%hook UIKBBackdropView
+- (void)layoutSubviews {
     %orig;
-    
-    // 处理表情键盘/扩展键盘
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        for (UIView *subview in self.subviews) {
-            if ([subview isKindOfClass:%c(UIKBVisualEffectView)]) {
-                [(UIKBVisualEffectView *)subview setEffect:nil];
-            }
-        }
-    });
+    NSLog(@"[KeyboardTheme] UIKBBackdropView layoutSubviews");
 }
-
 %end
 
-#pragma mark - 初始化
-%ctor {
-    NSLog(@"[KeyboardTheme] 初始化成功 - 版本1.0");
-    CFNotificationCenterAddObserver(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        NULL,
-        (CFNotificationCallback)reloadTheme,
-        CFSTR("com.keyboardtheme.reload"),
-        NULL,
-        CFNotificationSuspensionBehaviorDeliverImmediately
-    );
+%hook UIInputView
+- (void)layoutSubviews {
+    %orig;
+    NSLog(@"[KeyboardTheme] UIInputView layoutSubviews");
+}
+%end
+
+%hook UIKeyboardDockView
+- (void)layoutSubviews {
+    %orig;
+    NSLog(@"[KeyboardTheme] UIKeyboardDockView layoutSubviews");
+}
+%end
+
+%hook UIKeyboardCandidateViewStyle
+
+- (id)arrowButtonBackgroundColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] arrowButtonBackgroundColor: %@", color);
+    return color;
 }
 
-static void reloadTheme() {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"UIKeyboardDidShowNotification" object:nil];
-    });
+- (id)gridBackgroundColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] gridBackgroundColor: %@", color);
+    return color;
 }
+
+- (id)highlightedBackgroundColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] highlightedBackgroundColor: %@", color);
+    return color;
+}
+
+- (id)highlightedTextColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] highlightedTextColor: %@", color);
+    return color;
+}
+
+- (id)lineColor {
+    id color = %orig;
+    NSLog(@"[KeyboardTheme] lineColor: %@", color);
+    return color;
+}
+
+- (id)arrowButtonSeparatorImage {
+    id image = %orig;
+    NSLog(@"[KeyboardTheme] arrowButtonSeparatorImage: %@", image);
+    return image;
+}
+%end
+
+%hook UIKBRenderConfig
+
+- (void)setKeyBackgroundType:(int)type {
+    %orig;
+    NSLog(@"[KeyboardTheme] setKeyBackgroundType: %d", type);
+}
+
+- (void)setKeyBackgroundOpacity:(float)opacity {
+    %orig;
+    NSLog(@"[KeyboardTheme] setKeyBackgroundOpacity: %f", opacity);
+}
+%end
+
+%hook UIPredictionViewController
+- (id)_currentTextSuggestions {
+    id suggestions = %orig;
+    NSLog(@"[KeyboardTheme] _currentTextSuggestions: %@", suggestions);
+    return suggestions;
+}
+%end
