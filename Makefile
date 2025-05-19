@@ -12,5 +12,7 @@ KeyboardTheme_PRIVATE_FRAMEWORKS = Preferences
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
+INSTALL_TARGET_PROCESSES = SpringBoard
+
 after-install::
 	install.exec "killall -9 SpringBoard"
