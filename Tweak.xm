@@ -15,7 +15,7 @@
 
     // 避免重复添加
     if (![self viewWithTag:9527]) {
-        CGRect frame = self.bounds;
+        CGRect frame = ((UIView *)self).bounds;
 
         UIView *bgView = [[UIView alloc] initWithFrame:frame];
         bgView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
