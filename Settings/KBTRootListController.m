@@ -1,5 +1,7 @@
 #import "KBTRootListController.h"
+#import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
+
 
 @implementation KBTRootListController
 
