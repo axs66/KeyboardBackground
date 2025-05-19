@@ -1,8 +1,8 @@
-Package: com.axs.keyboardbackground
-Name: KeyboardBackground
+Package: com.axs.keyboardtheme
+Name: KeyboardTheme
 Version: 0.0.1
 Architecture: iphoneos-arm
-Description: KeyboardBackgroundTweak on iOS 16
+Description: KeyboardThemeTweak on iOS 16
 Maintainer: Axs
 Author:  Axs
 Section: Tweaks
