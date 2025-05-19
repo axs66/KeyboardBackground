@@ -1,6 +1,10 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
+// 补充声明，告诉编译器 UIKBVisualEffectView 是 UIView 子类
+@interface UIKBVisualEffectView : UIView
+@end
+
 UIColor* fetchBackgroundColorFromDefaults() {
     NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.yourname.keyboardtheme.plist"];
     NSString *colorString = prefs[@"backgroundColor"];
