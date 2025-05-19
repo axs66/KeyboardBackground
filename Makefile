@@ -11,15 +11,12 @@ KeyboardTheme_FILES = Tweak.xm
 KeyboardTheme_FRAMEWORKS = UIKit
 KeyboardTheme_CFLAGS = -fobjc-arc
 
-# 过滤器plist路径（确保文件存在）
-KeyboardTheme_FILTERS = plist/KeyboardTheme.plist
-
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-# 额外安装文件
+# 额外安装文件（设置界面和资源图片）
 KeyboardTheme_EXTRA_INSTALL_FILES += \
     Resources/keyboard_bg.png \
-    PreferenceLoader/Preferences/KeyboardTheme.plist
+    layout/Library/PreferenceLoader/Preferences/KeyboardTheme.plist
 
 after-install::
 	install.exec "killall -9 SpringBoard"
