@@ -2,7 +2,7 @@ Package: com.axs.keyboardtheme
 Name: KeyboardTheme
 Version: 0.0.1
 Architecture: iphoneos-arm
-Description: KeyboardThemeTweak on iOS 16
+Description: KeyboardTheme on iOS 16
 Maintainer: Axs
 Author:  Axs
 Section: Tweaks
