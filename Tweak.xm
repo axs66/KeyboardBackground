@@ -6,7 +6,7 @@
 @end
 
 UIColor* fetchBackgroundColorFromDefaults() {
-    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.yourname.keyboardtheme.plist"];
+    NSDictionary *prefs = [[NSDictionary alloc] initWithContentsOfFile:@"/var/mobile/Library/Preferences/com.axs.keyboardtheme.plist"];
     NSString *colorString = prefs[@"backgroundColor"];
 
     if (colorString) {
@@ -38,7 +38,7 @@ void setCustomBackgroundColor(UIColor *color) {
 - (void)layoutSubviews {
     %orig;
 
-    NSLog(@"[+] KeyboardThemeTweak: layoutSubviews hook");
+    NSLog(@"[+] KeyboardTheme: layoutSubviews hook");
 
     // 关闭系统模糊效果
     if ([self respondsToSelector:@selector(setEffect:)]) {
@@ -52,7 +52,7 @@ void setCustomBackgroundColor(UIColor *color) {
         bgView.tag = 9527;
 
         // 首先尝试加载背景图
-        UIImage *bgImage = [UIImage imageWithContentsOfFile:@"/Library/KeyboardThemeTweak/keyboard_bg.png"];
+        UIImage *bgImage = [UIImage imageWithContentsOfFile:@"/Library/KeyboardTheme/keyboard_bg.png"];
         if (bgImage) {
             UIImageView *bgImageView = [[UIImageView alloc] initWithImage:bgImage];
             bgImageView.contentMode = UIViewContentModeScaleAspectFill;
