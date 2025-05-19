@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/build.yml'  # 监控 build.yml 文件的变化
       - 'Tweak.xm'  # 增加对 Tweak.xm 文件的监控
+      - 'control'
     branches:
       - 'main'  # 仅在推送到 main 分支时触发
 
