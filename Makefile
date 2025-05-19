@@ -15,7 +15,7 @@ KeyboardTheme_FILTERS = plist/KeyboardTheme.plist
 include $(THEOS_MAKE_PATH)/tweak.mk
 
 # 安装纯plist偏好设置文件到系统设置界面（不编译bundle）
-KeyboardTheme_INSTALL_PATH = /Library/PreferenceLoader/Preferences
+KeyboardTheme_INSTALL_PATH = /Library/PreferenceLoader/Preferences/KeyboardTheme.plist
 KeyboardTheme_EXTRA_INSTALL_FILES = layout/Library/PreferenceLoader/Preferences/KeyboardTheme.plist
 
 after-install::
