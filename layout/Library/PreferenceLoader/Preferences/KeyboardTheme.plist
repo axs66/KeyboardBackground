@@ -3,34 +3,34 @@
   "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>title</key>
+    <key>Title</key>
     <string>键盘主题</string>
-    <key>items</key>
+    <key>Items</key>
     <array>
         <dict>
-            <key>cell</key>
+            <key>Cell</key>
             <string>PSGroupCell</string>
-            <key>label</key>
+            <key>Label</key>
             <string>背景设置</string>
         </dict>
         <dict>
-            <key>cell</key>
-            <string>PSTitleValueCell</string>
-            <key>label</key>
+            <key>Cell</key>
+            <string>PSEditTextCell</string>
+            <key>Label</key>
             <string>背景图片路径</string>
-            <key>key</key>
+            <key>Key</key>
             <string>ImagePath</string>
-            <key>default</key>
+            <key>Default</key>
             <string>/Library/KeyboardTheme/keyboard_bg.png</string>
         </dict>
         <dict>
-            <key>cell</key>
+            <key>Cell</key>
             <string>PSEditTextCell</string>
-            <key>label</key>
+            <key>Label</key>
             <string>背景颜色 (R,G,B)</string>
-            <key>key</key>
+            <key>Key</key>
             <string>backgroundColor</string>
-            <key>default</key>
+            <key>Default</key>
             <string>255,255,255</string>
         </dict>
     </array>
