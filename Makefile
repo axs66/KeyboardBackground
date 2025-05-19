@@ -1,26 +1,17 @@
-ARCHS = arm64 arm64e
-TARGET = iphone:clang:latest:16.0
-
-include $(THEOS)/makefiles/common.mk
-
-PACKAGE_VERSION = 1.0.0
+TARGET := iphone:clang:latest:14.5
 INSTALL_TARGET_PROCESSES = SpringBoard
 
-# tweak 设置
 TWEAK_NAME = KeyboardTheme
 KeyboardTheme_FILES = Tweak.xm
-KeyboardTheme_FRAMEWORKS = UIKit CoreGraphics
+KeyboardTheme_FRAMEWORKS = UIKit
 
+include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-# 设置面板独立为一个 bundle
+# 设置界面只安装 plist，不编译任何 .m 文件
 BUNDLE_NAME = KeyboardThemeSettings
-KeyboardThemeSettings_FILES = Settings/KBTRootListController.m
 KeyboardThemeSettings_INSTALL_PATH = /Library/PreferenceBundles
-KeyboardThemeSettings_FRAMEWORKS = UIKit
-KeyboardThemeSettings_PRIVATE_FRAMEWORKS = Preferences
-KeyboardThemeSettings_RESOURCE_DIRS = plist
-
+KeyboardThemeSettings_RESOURCE_DIRS = layout/Library/PreferenceLoader/Preferences
 include $(THEOS_MAKE_PATH)/bundle.mk
 
 after-install::
