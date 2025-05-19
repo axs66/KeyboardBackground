@@ -1,5 +1,10 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+@interface UIKBVisualEffectView : UIView
+@end
+
 
 #pragma mark - Hook: UIKBVisualEffectView，用于插入背景视图
 %hook UIKBVisualEffectView
