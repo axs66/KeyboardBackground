@@ -36,12 +36,12 @@ jobs:
       - name: Create GitHub Release
         run: |
           VERSION=$(date +v%Y%m%d%H%M)
-          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "KeyboardBackground $VERSION" --notes "自动构建 .deb 安装包"
+          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "KeyboardTheme $VERSION" --notes "自动构建 .deb 安装包"
         env:
           GH_TOKEN: ${{ secrets.PAT }}
 
       - name: Upload DEB to workflow artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
-          name: keyboardbackground
+          name: KeyboardTheme
           path: ${{ github.workspace }}/packages/*.deb
