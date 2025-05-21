@@ -1,7 +1,5 @@
 #import "KBTRootListController.h"
-#import <Preferences/PSSpecifier.h>
-#import <spawn.h>  // 添加此行，声明 posix_spawn
-#import "../Settings/ThemeManager.h"
+#import <spawn.h>
 
 @implementation KBTRootListController
 
@@ -16,11 +14,6 @@
     pid_t pid;
     const char *args[] = {"killall", "-9", "SpringBoard", NULL};
     posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char *const *)args, NULL);
-}
-
-- (void)reloadTheme {
-    [[ThemeManager sharedManager] reloadConfig];
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.axs66.KeyboardTheme/ReloadTheme"), NULL, NULL, true);
 }
 
 @end
