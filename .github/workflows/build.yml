@@ -40,7 +40,7 @@ jobs:
         run: |
           cd Cephei
           make clean
-          make
+          make -C preferences
           # 确保 .a 文件存在于 lib 目录中
           mkdir -p lib
           cp .theos/obj/debug/arm64/libCepheiPrefs.a lib/ || true
