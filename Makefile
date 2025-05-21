@@ -8,6 +8,7 @@ TWEAK_NAME = KeyboardTheme
 KeyboardTheme_FILES = Tweak.xm Settings/KBTRootListController.m Settings/ThemeManager.m
 KeyboardTheme_CFLAGS = -fobjc-arc
 KeyboardTheme_FRAMEWORKS = UIKit Foundation Preferences
+ADDITIONAL_OBJCFLAGS = -I./Settings
 
 after-install::
 	install.exec "killall -9 SpringBoard"
