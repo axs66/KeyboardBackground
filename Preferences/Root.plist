@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Title</key>
+    <string>Keyboard Theme 设置</string>
+    <key>PreferenceSpecifiers</key>
+    <array>
+        <dict>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+            <key>Title</key>
+            <string>背景设置</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Key</key>
+            <string>bgPath</string>
+            <key>Title</key>
+            <string>背景图路径</string>
+            <key>DefaultValue</key>
+            <string>/Library/KeyboardTheme/keyboard_bg.png</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Key</key>
+            <string>keyColor</string>
+            <key>Title</key>
+            <string>按键颜色（HEX）</string>
+            <key>DefaultValue</key>
+            <string>#1E1E1E</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Key</key>
+            <string>candidateBg</string>
+            <key>Title</key>
+            <string>候选栏背景（HEX）</string>
+            <key>DefaultValue</key>
+            <string>#222222</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Key</key>
+            <string>candidateText</string>
+            <key>Title</key>
+            <string>候选文字颜色（HEX）</string>
+            <key>DefaultValue</key>
+            <string>#00FFFF</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSSwitchSpecifier</string>
+            <key>Key</key>
+            <string>enableAnim</string>
+            <key>Title</key>
+            <string>启用按键动画</string>
+            <key>DefaultValue</key>
+            <true/>
+        </dict>
+    </array>
+</dict>
+</plist>
