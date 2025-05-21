@@ -2,13 +2,12 @@ name: CI
 
 on:
   push:
+    branches: [ main ]
     paths:
       - '.github/workflows/build.yml'
       - 'Tweak.xm'
-      - 'control'
       - 'Settings/**'
-    branches:
-      - 'main'
+      - 'control'
   workflow_dispatch:
 
 jobs:
@@ -21,23 +20,38 @@ jobs:
         with:
           submodules: true
 
-      - name: Use Theos Setup Action
+      - name: Setup Theos environment
         uses: axs66/theos-action@main
 
-      # 不再克隆和编译 Cephei，去掉相关步骤
+      - name: Clone Cephei repo
+        run: |
+          rm -rf Cephei
+          git clone --depth=1 https://github.com/hbang/libcephei.git Cephei
+
+      - name: Build Cephei static libraries
+        run: |
+          cd Cephei
+          make clean
+          make
+          # 复制 libCepheiPrefs.a 到 Cephei/lib 下（确保路径正确）
+          mkdir -p lib
+          cp ./lib/libCepheiPrefs.a ./lib/
+          cp ./lib/libCephei.a ./lib/
+          cp ./lib/libCepheiSpringBoard.a ./lib/
+          # 你可以根据需要复制其他库
 
       - name: Clean previous packages
         run: rm -f ${{ github.workspace }}/packages/*.deb
 
-      - name: Build DEB (rootless + roothide)
+      - name: Build tweak and bundle packages
         run: |
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
 
       - name: List generated DEBs
         run: ls -lh ${{ github.workspace }}/packages
 
       - name: Create GitHub Release
+        if: github.event_name == 'push'
         run: |
           VERSION=$(date +v%Y%m%d%H%M)
           gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "KeyboardTheme $VERSION" --notes "自动构建 .deb 安装包"
@@ -45,7 +59,7 @@ jobs:
           GH_TOKEN: ${{ secrets.PAT }}
 
       - name: Upload DEB to workflow artifacts
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@v4
         with:
           name: KeyboardTheme
           path: ${{ github.workspace }}/packages/*.deb
