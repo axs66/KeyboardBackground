@@ -1,6 +1,16 @@
-#import <CepheiPrefs/HBListController.h>
-#import <CepheiPrefs/HBRootListController.h>
 #import <CepheiPrefs/CepheiPrefs.h>
+#import <CepheiPrefs/CepheiPrefs-Swift.h>
+#import <CepheiPrefs/HBAboutListController.h>
+#import <CepheiPrefs/HBLinkTableCell.h>
+#import <CepheiPrefs/HBListController.h>
+#import <CepheiPrefs/HBMastodonTableCell.h>
+#import <CepheiPrefs/HBPackageNameHeaderCell.h>
+#import <CepheiPrefs/HBPackageTableCell.h>
+#import <CepheiPrefs/HBRootListController.h>
+#import <CepheiPrefs/HBStepperTableCell.h>
+#import <CepheiPrefs/HBSupportController.h>
+#import <CepheiPrefs/HBTintedTableCell.h>
+#import <CepheiPrefs/HBTwitterCell.h>
 #import <CepheiPrefs/PSListController+HBTintAdditions.h>
 #import <spawn.h>
 
