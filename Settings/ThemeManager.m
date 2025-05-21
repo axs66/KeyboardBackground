@@ -3,22 +3,23 @@
 @implementation ThemeManager
 
 + (instancetype)sharedManager {
-    static ThemeManager *shared = nil;
+    static ThemeManager *manager;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        shared = [[self alloc] init];
-        [shared loadTheme];
+        manager = [[ThemeManager alloc] init];
+        [manager loadThemeWithName:@"theme_default.json"];
     });
-    return shared;
+    return manager;
 }
 
-- (void)loadTheme {
-    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.yourcompany.keyboardtheme.plist"];
-    NSString *themeName = prefs[@"ThemeName"] ?: @"default";
-    NSString *path = [NSString stringWithFormat:@"/Library/Application Support/KeyboardTheme/theme_%@.json", themeName];
+- (void)loadThemeWithName:(NSString *)themeFileName {
+    NSString *path = [NSString stringWithFormat:@"/Library/Application Support/KeyboardTheme/%@", themeFileName];
     NSData *data = [NSData dataWithContentsOfFile:path];
-    if (data) {
-        self.currentTheme = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    if (!data) {
+        // fallback to bundled resource
+        path = [[NSBundle bundleForClass:self.class] pathForResource:[themeFileName stringByDeletingPathExtension] ofType:@"json"];
+        data = [NSData dataWithContentsOfFile:path];
     }
-}
-@end
+    if (data) {
+        NSError *error;
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
