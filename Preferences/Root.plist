@@ -52,3 +52,49 @@
             <key>Type</key>
             <string>PSColorPickerSpecifier</string>
             <key>Title</key>
+            <string>候选栏网格背景色</string>
+            <key>Key</key>
+            <string>gridBackgroundColor</string>
+            <key>DefaultValue</key>
+            <string>#EEEEEE</string>
+        </dict>
+
+        <dict>
+            <key>Type</key>
+            <string>PSColorPickerSpecifier</string>
+            <key>Title</key>
+            <string>按键高亮文字颜色</string>
+            <key>Key</key>
+            <string>highlightedTextColor</string>
+            <key>DefaultValue</key>
+            <string>#000000</string>
+        </dict>
+
+        <dict>
+            <key>Type</key>
+            <string>PSSliderSpecifier</string>
+            <key>Title</key>
+            <string>按键背景不透明度</string>
+            <key>Key</key>
+            <string>keyBackgroundOpacity</string>
+            <key>DefaultValue</key>
+            <real>0.5</real>
+            <key>MinimumValue</key>
+            <real>0.0</real>
+            <key>MaximumValue</key>
+            <real>1.0</real>
+        </dict>
+
+        <dict>
+            <key>Type</key>
+            <string>PSButtonSpecifier</string>
+            <key>Title</key>
+            <string>应用更改（重载主题）</string>
+            <key>Key</key>
+            <string>reloadTheme</string>
+            <key>Action</key>
+            <string>reloadTheme:</string>
+        </dict>
+    </array>
+</dict>
+</plist>
