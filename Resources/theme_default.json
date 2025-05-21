@@ -1,4 +1,7 @@
 {
-  "highlightedTextColor": "FF3B30",
-  "keyAlpha": 0.9
+  "backgroundImage": "bg_default.png",
+  "keyBackgroundColor": "#FFFFFF",
+  "keyTextColor": "#000000",
+  "candidateBarBackgroundColor": "#F0F0F0",
+  "animationDuration": 0.3
 }
