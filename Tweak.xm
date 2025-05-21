@@ -2,6 +2,26 @@
 #import <notify.h>
 #import "ThemeManager.h"
 
+// 私有类完整声明，避免编译错误
+@interface UIKBKeyView : UIView
+@property (nonatomic, strong) UIColor *backgroundColor;
+@property (nonatomic, readonly) CALayer *layer;
+@end
+
+@interface UIKBKeyBackgroundView : UIView
+@end
+
+@interface UIKBBackdropView : UIView
+@end
+
+@interface UIKeyboardCandidateBarCell : UIView
+@property (nonatomic, strong) UIColor *backgroundColor;
+@end
+
+@interface UIKeyboardCandidateView : UIView
+@property (nonatomic, strong) UIColor *backgroundColor;
+@end
+
 static UIImage *kbt_backgroundImage = nil;
 static UIColor *kbt_keyColor = nil;
 static UIColor *kbt_candidateBgColor = nil;
@@ -22,7 +42,10 @@ static void loadTheme() {
     if (colorHex) {
         unsigned rgb = 0;
         [[NSScanner scannerWithString:[colorHex stringByReplacingOccurrencesOfString:@"#" withString:@""]] scanHexInt:&rgb];
-        kbt_keyColor = [UIColor colorWithRed:((rgb>>16)&0xFF)/255.0 green:((rgb>>8)&0xFF)/255.0 blue:(rgb&0xFF)/255.0 alpha:1.0];
+        kbt_keyColor = [UIColor colorWithRed:((rgb>>16)&0xFF)/255.0
+                                       green:((rgb>>8)&0xFF)/255.0
+                                        blue:(rgb&0xFF)/255.0
+                                       alpha:1.0];
     } else {
         kbt_keyColor = nil;
     }
@@ -31,7 +54,10 @@ static void loadTheme() {
     if (candidateColorHex) {
         unsigned rgb = 0;
         [[NSScanner scannerWithString:[candidateColorHex stringByReplacingOccurrencesOfString:@"#" withString:@""]] scanHexInt:&rgb];
-        kbt_candidateBgColor = [UIColor colorWithRed:((rgb>>16)&0xFF)/255.0 green:((rgb>>8)&0xFF)/255.0 blue:(rgb&0xFF)/255.0 alpha:1.0];
+        kbt_candidateBgColor = [UIColor colorWithRed:((rgb>>16)&0xFF)/255.0
+                                              green:((rgb>>8)&0xFF)/255.0
+                                               blue:(rgb&0xFF)/255.0
+                                              alpha:1.0];
     } else {
         kbt_candidateBgColor = nil;
     }
@@ -44,13 +70,18 @@ static void loadTheme() {
     NSLog(@"[KeyboardTheme] Theme reloaded");
 }
 
-static void reloadTheme(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
+static void reloadTheme(CFNotificationCenterRef center, void *observer, CFStringRef name,
+                        const void *object, CFDictionaryRef userInfo) {
     NSLog(@"[KeyboardTheme] Received Darwin notification to reload theme.");
     loadTheme();
 }
 
 %ctor {
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadTheme, CFSTR("com.axs66.KeyboardTheme/ReloadTheme"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL,
+                                    (CFNotificationCallback)reloadTheme,
+                                    CFSTR("com.axs66.KeyboardTheme/ReloadTheme"),
+                                    NULL,
+                                    CFNotificationSuspensionBehaviorDeliverImmediately);
     loadTheme();
 }
 
@@ -105,7 +136,6 @@ static void reloadTheme(CFNotificationCenterRef center, void *observer, CFString
 }
 %end
 
-// 添加简单淡入动画示例
 %hook UIInputView
 - (void)didMoveToWindow {
     %orig;
