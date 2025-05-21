@@ -1,38 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" 
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>Title</key>
-    <string>键盘主题</string>
-    <key>Items</key>
+    <key>items</key>
     <array>
         <dict>
-            <key>Cell</key>
-            <string>PSGroupCell</string>
-            <key>Label</key>
-            <string>背景设置</string>
-        </dict>
-        <dict>
-            <key>Cell</key>
-            <string>PSEditTextCell</string>
-            <key>Label</key>
-            <string>背景图片路径</string>
-            <key>Key</key>
-            <string>ImagePath</string>
-            <key>Default</key>
-            <string>/Library/KeyboardTheme/keyboard_bg.png</string>
-        </dict>
-        <dict>
-            <key>Cell</key>
-            <string>PSEditTextCell</string>
-            <key>Label</key>
-            <string>背景颜色 (R,G,B)</string>
-            <key>Key</key>
-            <string>backgroundColor</string>
-            <key>Default</key>
-            <string>255,255,255</string>
+            <key>cell</key>
+            <string>PSListController</string>
+            <key>label</key>
+            <string>选择主题</string>
+            <key>detail</key>
+            <string>KBTRootListController</string>
         </dict>
     </array>
+    <key>title</key>
+    <string>键盘主题</string>
 </dict>
 </plist>
