@@ -15,11 +15,11 @@ KeyboardTheme_INSTALL_PATH = /Library/MobileSubstrate/DynamicLibraries
 BUNDLE_NAME = KeyboardThemePrefs
 KeyboardThemePrefs_FILES = Settings/KBTRootListController.m Settings/ThemeManager.m
 KeyboardThemePrefs_CFLAGS = -fobjc-arc
-KeyboardThemePrefs_FRAMEWORKS = UIKit Foundation Preferences
-KeyboardThemePrefs_INSTALL_PATH = /Library/PreferenceBundles/KeyboardThemePrefs.bundle
+KeyboardThemePrefs_FRAMEWORKS = UIKit Foundation
+KeyboardThemePrefs_LIBRARIES = cephei
+
+include $(THEOS)/makefiles/common.mk
+include $(THEOS_MAKE_PATH)/bundle.mk
 
 after-install::
 	install.exec "killall -9 SpringBoard"
-
-include $(THEOS_MAKE_PATH)/tweak.mk
-include $(THEOS_MAKE_PATH)/bundle.mk
