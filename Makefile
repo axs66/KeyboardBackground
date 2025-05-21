@@ -1,8 +1,6 @@
 ARCHS = arm64 arm64e
 TARGET = iphone:clang:latest:15.0
 
-include $(THEOS)/makefiles/common.mk
-
 # 主 tweak
 TWEAK_NAME = KeyboardTheme
 KeyboardTheme_FILES = Tweak.xm Settings/ThemeManager.m
