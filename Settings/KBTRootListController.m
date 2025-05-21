@@ -1,5 +1,7 @@
-#import <Cephei/HBPreferences.h>
-#import <CepheiUI/HBListController.h>
+#import <CepheiPrefs/HBListController.h>
+#import <CepheiPrefs/HBRootListController.h>
+#import <CepheiPrefs/CepheiPrefs.h>
+#import <CepheiPrefs/PSListController+HBTintAdditions.h>
 #import <spawn.h>
 
 @interface KBTRootListController : HBListController
