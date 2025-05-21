@@ -25,10 +25,13 @@ jobs:
 
       # ✅ 新增：克隆并构建 Cephei
       - name: Clone Cephei
-        run: git clone --depth=1 https://github.com/hbang/libcephei.git Cephei
+        run: |
+          rm -rf Cephei
+          git clone --depth=1 https://github.com/hbang/libcephei.git Cephei
 
       - name: Build Cephei
         run: make -C Cephei
+
 
       - name: Clean previous packages
         run: rm -f ${{ github.workspace }}/packages/*.deb
