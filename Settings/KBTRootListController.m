@@ -1,25 +1,7 @@
-#import <CepheiPrefs/CepheiPrefs.h>
-#import <CepheiPrefs/CepheiPrefs-Swift.h>
-#import <CepheiPrefs/HBAboutListController.h>
-#import <CepheiPrefs/HBLinkTableCell.h>
-#import <CepheiPrefs/HBListController.h>
-#import <CepheiPrefs/HBMastodonTableCell.h>
-#import <CepheiPrefs/HBPackageNameHeaderCell.h>
-#import <CepheiPrefs/HBPackageTableCell.h>
-#import <CepheiPrefs/HBRootListController.h>
-#import <CepheiPrefs/HBStepperTableCell.h>
-#import <CepheiPrefs/HBSupportController.h>
-#import <CepheiPrefs/HBTintedTableCell.h>
-#import <CepheiPrefs/HBTwitterCell.h>
-#import <CepheiPrefs/PSListController+HBTintAdditions.h>
+#import "KBTRootListController.h"
 #import <spawn.h>
 
-@interface KBTRootListController : HBListController
-@end
-
 @implementation KBTRootListController
-
-// 不需要重写 init，Theos 会自动加载 KeyboardTheme.plist
 
 - (NSArray *)specifiers {
     if (!_specifiers) {
