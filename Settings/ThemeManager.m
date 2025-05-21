@@ -23,3 +23,8 @@
     if (data) {
         NSError *error;
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+            if (dict && !error) {
+        self.themeConfig = dict;
+    }
+}
+
