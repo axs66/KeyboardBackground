@@ -1,17 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" 
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>items</key>
-    <array>
-        <dict>
-            <key>cell</key>
-            <string>PSListController</string>
-            <key>label</key>
-            <string>选择主题</string>
-            <key>detail</key>
-            <string>KBTRootListController</string>
-        </dict>
-    </array>
-    <key>title</key>
-    <string>键盘主题</string>
+  <key>Title</key>
+  <string>KeyboardTheme</string>
+  <key>FooterText</key>
+  <string>Customize your keyboard appearance and animation.</string>
+  <key>PreferenceSpecifiers</key>
+  <array>
+    <dict>
+      <key>Type</key>
+      <string>PSGroupSpecifier</string>
+      <key>Title</key>
+      <string>Theme Selection</string>
+    </dict>
+    <dict>
+      <key>Type</key>
+      <string>PSMultiValueSpecifier</string>
+      <key>Title</key>
+      <string>Choose Theme</string>
+      <key>Key</key>
+      <string>SelectedTheme</string>
+      <key>DefaultValue</key>
+      <string>theme_default.json</string>
+      <key>Values</key>
+      <array>
+        <string>theme_default.json</string>
+        <string>theme_dark.json</string>
+      </array>
+      <key>Titles</key>
+      <array>
+        <string>Default</string>
+        <string>Dark</string>
+      </array>
+    </dict>
+    <dict>
+      <key>Type</key>
+      <string>PSTitleValueSpecifier</string>
+      <key>Title</key>
+      <string>Background Image</string>
+      <key>Key</key>
+      <string>BackgroundImage</string>
+      <key>DefaultValue</key>
+      <string>bg_default.png</string>
+    </dict>
+    <dict>
+      <key>Type</key>
+      <string>PSColorPickerSpecifier</string>
+      <key>Title</key>
+      <string>Key Background Color</string>
+      <key>Key</key>
+      <string>KeyBackgroundColor</string>
+      <key>DefaultValue</key>
+      <string>#FFFFFF</string>
+    </dict>
+    <dict>
+      <key>Type</key>
+      <string>PSColorPickerSpecifier</string>
+      <key>Title</key>
+      <string>Key Text Color</string>
+      <key>Key</key>
+      <string>KeyTextColor</string>
+      <key>DefaultValue</key>
+      <string>#000000</string>
+    </dict>
+    <dict>
+      <key>Type</key>
+      <string>PSColorPickerSpecifier</string>
+      <key>Title</key>
+      <string>Candidate Bar Background Color</string>
+      <key>Key</key>
+      <string>CandidateBarBackgroundColor</string>
+      <key>DefaultValue</key>
+      <string>#F0F0F0</string>
+    </dict>
+    <dict>
+      <key>Type</key>
+      <string>PSSliderSpecifier</string>
+      <key>Title</key>
+      <string>Animation Duration</string>
+      <key>Key</key>
+      <string>AnimationDuration</string>
+      <key>DefaultValue</key>
+      <real>0.3</real>
+      <key>MinimumValue</key>
+      <real>0.1</real>
+      <key>MaximumValue</key>
+      <real>1.0</real>
+      <key>MinimumValueImage</key>
+      <string>min.png</string>
+      <key>MaximumValueImage</key>
+      <string>max.png</string>
+    </dict>
+    <dict>
+      <key>Type</key>
+      <string>PSButtonSpecifier</string>
+      <key>Title</key>
+      <string>Apply Changes</string>
+      <key>Key</key>
+      <string>ApplyButton</string>
+      <key>Action</key>
+      <string>applyButtonPressed:</string>
+    </dict>
+  </array>
 </dict>
 </plist>
