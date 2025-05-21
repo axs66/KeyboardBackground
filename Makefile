@@ -14,7 +14,7 @@ KeyboardThemePrefs_FILES = Settings/KBTRootListController.m
 KeyboardThemePrefs_CFLAGS = -fobjc-arc
 KeyboardThemePrefs_FRAMEWORKS = UIKit Foundation
 KeyboardThemePrefs_PRIVATE_FRAMEWORKS = Preferences
-KeyboardThemePrefs_LIBRARIES = Cephei CepheiPrefs
+KeyboardThemePrefs_LIBRARIES = CepheiPrefs
 KeyboardThemePrefs_INSTALL_PATH = /Library/PreferenceBundles
 
 include $(THEOS)/makefiles/common.mk
