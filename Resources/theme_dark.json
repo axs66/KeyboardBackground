@@ -1,0 +1,7 @@
+{
+  "backgroundImage": "bg_dark.png",
+  "keyBackgroundColor": "#222222",
+  "keyTextColor": "#EEEEEE",
+  "candidateBarBackgroundColor": "#333333",
+  "animationDuration": 0.5
+}
