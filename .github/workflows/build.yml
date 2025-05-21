@@ -23,22 +23,29 @@ jobs:
       - name: Setup Theos environment
         uses: axs66/theos-action@main
 
-      - name: Clone Cephei repo
+      - name: Clone and patch Cephei repo
         run: |
           rm -rf Cephei
           git clone --depth=1 https://github.com/hbang/libcephei.git Cephei
 
-      - name: Build Cephei static libraries
+          cd Cephei
+
+          # Patch Makefile to skip building CepheiPrefs.framework (which depends on MobileIcons)
+          cp Makefile Makefile.bak
+          sed -i.bak '/CepheiPrefs.framework/d' Makefile
+          sed -i.bak '/internal-framework/d' Makefile
+          sed -i.bak '/framework/d' Makefile
+
+      - name: Build Cephei static libraries only
         run: |
           cd Cephei
           make clean
           make
-          # 复制 libCepheiPrefs.a 到 Cephei/lib 下（确保路径正确）
+          # 确保 .a 文件存在于 lib 目录中
           mkdir -p lib
-          cp ./lib/libCepheiPrefs.a ./lib/
-          cp ./lib/libCephei.a ./lib/
-          cp ./lib/libCepheiSpringBoard.a ./lib/
-          # 你可以根据需要复制其他库
+          cp .theos/obj/debug/arm64/libCepheiPrefs.a lib/ || true
+          cp .theos/obj/debug/arm64/libCephei.a lib/ || true
+          cp .theos/obj/debug/arm64/libCepheiSpringBoard.a lib/ || true
 
       - name: Clean previous packages
         run: rm -f ${{ github.workspace }}/packages/*.deb
