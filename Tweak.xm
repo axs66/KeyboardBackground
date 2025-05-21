@@ -1,145 +1,219 @@
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import <substrate.h>
 
-@interface UIKBVisualEffectView : UIView
+// 主题管理器，负责读取配置和热重载
+@interface ThemeManager : NSObject
+@property (nonatomic, strong) NSDictionary *themeConfig;
++ (instancetype)sharedManager;
+- (void)loadTheme;
+- (UIColor *)colorForKey:(NSString *)key withDefault:(UIColor *)def;
+- (NSString *)imagePathForKey:(NSString *)key;
+@end
+
+@implementation ThemeManager
+
++ (instancetype)sharedManager {
+    static ThemeManager *manager;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        manager = [[ThemeManager alloc] init];
+        [manager loadTheme];
+        // 监听配置热重载通知
+        [[NSNotificationCenter defaultCenter] addObserver:manager selector:@selector(loadTheme) name:@"com.keyboardtheme.reload" object:nil];
+    });
+    return manager;
+}
+
+- (void)loadTheme {
+    NSString *path = @"/Library/Application Support/KeyboardTheme/theme.json";
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    if (data) {
+        NSError *error = nil;
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        if (!error && [json isKindOfClass:[NSDictionary class]]) {
+            self.themeConfig = json;
+            NSLog(@"[KeyboardTheme] Loaded theme config: %@", self.themeConfig);
+        } else {
+            NSLog(@"[KeyboardTheme] JSON parse error: %@", error);
+        }
+    } else {
+        NSLog(@"[KeyboardTheme] theme.json not found, using defaults.");
+        self.themeConfig = @{};
+    }
+}
+
+- (UIColor *)colorForKey:(NSString *)key withDefault:(UIColor *)def {
+    NSString *hex = self.themeConfig[key];
+    if (hex && [hex isKindOfClass:[NSString class]] && hex.length == 7 && [hex hasPrefix:@"#"]) {
+        unsigned rgbValue = 0;
+        NSScanner *scanner = [NSScanner scannerWithString:[hex substringFromIndex:1]];
+        [scanner scanHexInt:&rgbValue];
+        return [UIColor colorWithRed:((rgbValue >> 16) & 0xFF)/255.0
+                               green:((rgbValue >> 8) & 0xFF)/255.0
+                                blue:(rgbValue & 0xFF)/255.0
+                               alpha:1.0];
+    }
+    return def;
+}
+
+- (NSString *)imagePathForKey:(NSString *)key {
+    NSString *path = self.themeConfig[key];
+    if (path && [path isKindOfClass:[NSString class]]) {
+        return path;
+    }
+    return nil;
+}
+
 @end
 
 
-#pragma mark - Hook: UIKBVisualEffectView，用于插入背景视图
-%hook UIKBVisualEffectView
+// ======================= 调试Hooks =======================
 
-- (void)layoutSubviews {
-    %orig;
-    NSLog(@"[KeyboardTheme] UIKBVisualEffectView layoutSubviews");
-
-    // 取消系统模糊背景效果
-    if ([self respondsToSelector:@selector(setEffect:)]) {
-        [self performSelector:@selector(setEffect:) withObject:nil];
-    }
-
-    // 避免重复添加
-    if (![self viewWithTag:9527]) {
-        CGRect frame = ((UIView *)self).bounds;
-
-        UIView *bgView = [[UIView alloc] initWithFrame:frame];
-        bgView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        bgView.tag = 9527;
-
-        UIImage *bgImage = [UIImage imageWithContentsOfFile:@"/Library/KeyboardTheme/keyboard_bg.png"];
-        if (bgImage) {
-            UIImageView *bgImageView = [[UIImageView alloc] initWithImage:bgImage];
-            bgImageView.contentMode = UIViewContentModeScaleAspectFill;
-            bgImageView.frame = frame;
-            bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-            [bgView addSubview:bgImageView];
-        } else {
-            // 图片不存在时使用默认颜色（浅灰）
-            bgView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
-        }
-
-        [self addSubview:bgView];
-        [self sendSubviewToBack:bgView];
-    }
-}
-%end
-
-#pragma mark - Hook: UIInputViewController 设置主背景色（非必要，可选保留）
-%hook UIInputViewController
-
-- (void)viewDidLoad {
-    %orig;
-    NSLog(@"[KeyboardTheme] UIInputViewController viewDidLoad");
-
-    // 可选：设置整个键盘控制器背景颜色（用于测试/一致性）
-    self.view.backgroundColor = [UIColor clearColor];
-}
-%end
-
-#pragma mark - 其它调试 Hook（保留以供观察键盘生命周期）
 %hook UIKBKeyView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardTheme] UIKBKeyView layoutSubviews");
+    NSLog(@"[KeyboardHook] UIKBKeyView layoutSubviews");
+}
+%end
+
+%hook UIKBKeyBackgroundView
+- (void)layoutSubviews {
+    %orig;
+    NSLog(@"[KeyboardHook] UIKBKeyBackgroundView layoutSubviews");
 }
 %end
 
 %hook UIKBBackdropView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardTheme] UIKBBackdropView layoutSubviews");
+    NSLog(@"[KeyboardHook] UIKBBackdropView layoutSubviews");
+}
+%end
+
+%hook UIKBVisualEffectView
+- (void)layoutSubviews {
+    %orig;
+    NSLog(@"[KeyboardHook] UIKBVisualEffectView layoutSubviews");
 }
 %end
 
 %hook UIInputView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardTheme] UIInputView layoutSubviews");
+    NSLog(@"[KeyboardHook] UIInputView layoutSubviews");
 }
 %end
 
 %hook UIKeyboardDockView
 - (void)layoutSubviews {
     %orig;
-    NSLog(@"[KeyboardTheme] UIKeyboardDockView layoutSubviews");
+    NSLog(@"[KeyboardHook] UIKeyboardDockView layoutSubviews");
 }
 %end
 
+// ======================= 主要功能Hooks =======================
+
+// 自定义键盘背景图
+%hook UIKBKeyBackgroundView
+- (void)drawRect:(CGRect)rect {
+    %orig;
+
+    ThemeManager *manager = [ThemeManager sharedManager];
+    NSString *bgPath = [manager imagePathForKey:@"backgroundImage"];
+    if (bgPath) {
+        UIImage *bgImage = [UIImage imageWithContentsOfFile:bgPath];
+        if (bgImage) {
+            [bgImage drawInRect:self.bounds blendMode:kCGBlendModeNormal alpha:1.0];
+            NSLog(@"[KeyboardTheme] Draw custom background image: %@", bgPath);
+            return; // 防止默认绘制覆盖
+        }
+    }
+}
+%end
+
+// 自定义键颜色 (示例：按键高亮背景色)
 %hook UIKeyboardCandidateViewStyle
+- (id)highlightedBackgroundColor {
+    ThemeManager *manager = [ThemeManager sharedManager];
+    UIColor *customColor = [manager colorForKey:@"highlightedBackgroundColor" withDefault:(UIColor *)%orig];
+    NSLog(@"[KeyboardTheme] highlightedBackgroundColor: %@", customColor);
+    return customColor;
+}
 
 - (id)arrowButtonBackgroundColor {
-    id color = %orig;
-    NSLog(@"[KeyboardTheme] arrowButtonBackgroundColor: %@", color);
-    return color;
+    ThemeManager *manager = [ThemeManager sharedManager];
+    UIColor *customColor = [manager colorForKey:@"arrowButtonBackgroundColor" withDefault:(UIColor *)%orig];
+    return customColor;
 }
 
 - (id)gridBackgroundColor {
-    id color = %orig;
-    NSLog(@"[KeyboardTheme] gridBackgroundColor: %@", color);
-    return color;
-}
-
-- (id)highlightedBackgroundColor {
-    id color = %orig;
-    NSLog(@"[KeyboardTheme] highlightedBackgroundColor: %@", color);
-    return color;
+    ThemeManager *manager = [ThemeManager sharedManager];
+    UIColor *customColor = [manager colorForKey:@"gridBackgroundColor" withDefault:(UIColor *)%orig];
+    return customColor;
 }
 
 - (id)highlightedTextColor {
-    id color = %orig;
-    NSLog(@"[KeyboardTheme] highlightedTextColor: %@", color);
-    return color;
+    ThemeManager *manager = [ThemeManager sharedManager];
+    UIColor *customColor = [manager colorForKey:@"highlightedTextColor" withDefault:(UIColor *)%orig];
+    return customColor;
 }
 
 - (id)lineColor {
-    id color = %orig;
-    NSLog(@"[KeyboardTheme] lineColor: %@", color);
-    return color;
+    ThemeManager *manager = [ThemeManager sharedManager];
+    UIColor *customColor = [manager colorForKey:@"lineColor" withDefault:(UIColor *)%orig];
+    return customColor;
 }
 
 - (id)arrowButtonSeparatorImage {
-    id image = %orig;
-    NSLog(@"[KeyboardTheme] arrowButtonSeparatorImage: %@", image);
-    return image;
+    ThemeManager *manager = [ThemeManager sharedManager];
+    NSString *imagePath = [manager imagePathForKey:@"arrowButtonSeparatorImage"];
+    if (imagePath) {
+        UIImage *img = [UIImage imageWithContentsOfFile:imagePath];
+        if (img) return img;
+    }
+    return %orig;
 }
 %end
 
+// Render 配置相关（示例：设置键盘背景透明度）
 %hook UIKBRenderConfig
-
-- (void)setKeyBackgroundType:(int)type {
-    %orig;
-    NSLog(@"[KeyboardTheme] setKeyBackgroundType: %d", type);
-}
-
 - (void)setKeyBackgroundOpacity:(float)opacity {
-    %orig;
-    NSLog(@"[KeyboardTheme] setKeyBackgroundOpacity: %f", opacity);
+    ThemeManager *manager = [ThemeManager sharedManager];
+    NSNumber *opacityNum = manager.themeConfig[@"keyBackgroundOpacity"];
+    if (opacityNum) {
+        float customOpacity = [opacityNum floatValue];
+        NSLog(@"[KeyboardTheme] Override keyBackgroundOpacity: %f", customOpacity);
+        %orig(customOpacity);
+        return;
+    }
+    %orig(opacity);
 }
 %end
 
+// 预测词美化示例
 %hook UIPredictionViewController
 - (id)_currentTextSuggestions {
     id suggestions = %orig;
     NSLog(@"[KeyboardTheme] _currentTextSuggestions: %@", suggestions);
+    // 这里可对 suggestions 做美化处理
     return suggestions;
 }
 %end
+
+// ======================= 热重载触发辅助命令（外部执行） =======================
+// 你可以用命令行：
+// killall -SIGUSR1 SpringBoard
+// 或者发布通知：
+// notifyutil -p com.keyboardtheme.reload
+
+%ctor {
+    NSLog(@"[KeyboardTheme] Tweak loaded, init ThemeManager");
+    [ThemeManager sharedManager]; // 预加载主题
+
+    // 监听 Darwin 通知，实现热重载
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)^(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
+        NSLog(@"[KeyboardTheme] Received reload notification");
+        [[ThemeManager sharedManager] loadTheme];
+    }, CFSTR("com.keyboardtheme.reload"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+}
