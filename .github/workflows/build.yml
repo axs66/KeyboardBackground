@@ -8,7 +8,7 @@ on:
       - 'control'
     branches:
       - 'main'
-  workflow_dispatch:  # 👉 允许手动触发
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,6 +22,13 @@ jobs:
 
       - name: Use Theos Setup Action
         uses: axs66/theos-action@main
+
+      # ✅ 新增：克隆并构建 Cephei
+      - name: Clone Cephei
+        run: git clone --depth=1 https://github.com/hbang/libcephei.git Cephei
+
+      - name: Build Cephei
+        run: make -C Cephei
 
       - name: Clean previous packages
         run: rm -f ${{ github.workspace }}/packages/*.deb
