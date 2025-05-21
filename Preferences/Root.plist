@@ -3,65 +3,52 @@
 <plist version="1.0">
 <dict>
     <key>Title</key>
-    <string>Keyboard Theme 设置</string>
+    <string>KeyboardTheme</string>
     <key>PreferenceSpecifiers</key>
     <array>
         <dict>
             <key>Type</key>
             <string>PSGroupSpecifier</string>
             <key>Title</key>
-            <string>背景设置</string>
+            <string>主题设置</string>
         </dict>
+
         <dict>
             <key>Type</key>
             <string>PSTextFieldSpecifier</string>
-            <key>Key</key>
-            <string>bgPath</string>
             <key>Title</key>
-            <string>背景图路径</string>
+            <string>背景图片路径</string>
+            <key>Key</key>
+            <string>backgroundImage</string>
             <key>DefaultValue</key>
-            <string>/Library/KeyboardTheme/keyboard_bg.png</string>
+            <string>/Library/Application Support/KeyboardTheme/bg1.png</string>
+            <key>AutocapitalizationType</key>
+            <integer>0</integer>
         </dict>
+
         <dict>
             <key>Type</key>
-            <string>PSTextFieldSpecifier</string>
-            <key>Key</key>
-            <string>keyColor</string>
+            <string>PSColorPickerSpecifier</string>
             <key>Title</key>
-            <string>按键颜色（HEX）</string>
+            <string>按键高亮背景色</string>
+            <key>Key</key>
+            <string>highlightedBackgroundColor</string>
             <key>DefaultValue</key>
-            <string>#1E1E1E</string>
+            <string>#FFCC00</string>
         </dict>
+
         <dict>
             <key>Type</key>
-            <string>PSTextFieldSpecifier</string>
-            <key>Key</key>
-            <string>candidateBg</string>
+            <string>PSColorPickerSpecifier</string>
             <key>Title</key>
-            <string>候选栏背景（HEX）</string>
+            <string>箭头按钮背景色</string>
+            <key>Key</key>
+            <string>arrowButtonBackgroundColor</string>
             <key>DefaultValue</key>
-            <string>#222222</string>
+            <string>#FFFFFF</string>
         </dict>
+
         <dict>
             <key>Type</key>
-            <string>PSTextFieldSpecifier</string>
-            <key>Key</key>
-            <string>candidateText</string>
+            <string>PSColorPickerSpecifier</string>
             <key>Title</key>
-            <string>候选文字颜色（HEX）</string>
-            <key>DefaultValue</key>
-            <string>#00FFFF</string>
-        </dict>
-        <dict>
-            <key>Type</key>
-            <string>PSSwitchSpecifier</string>
-            <key>Key</key>
-            <string>enableAnim</string>
-            <key>Title</key>
-            <string>启用按键动画</string>
-            <key>DefaultValue</key>
-            <true/>
-        </dict>
-    </array>
-</dict>
-</plist>
