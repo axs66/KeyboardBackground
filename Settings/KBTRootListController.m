@@ -1,5 +1,6 @@
 #import "KBTRootListController.h"
 #import <Preferences/PSSpecifier.h>
+#import <spawn.h>  // 添加此行，声明 posix_spawn
 #import "../Settings/ThemeManager.h"
 
 @implementation KBTRootListController
