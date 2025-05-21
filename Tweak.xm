@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <notify.h>
-#import "ThemeManager.h"
+#import "Settings/ThemeManager.h"
 
 static UIImage *kbt_backgroundImage = nil;
 static UIColor *kbt_keyColor = nil;
