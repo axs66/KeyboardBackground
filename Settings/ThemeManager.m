@@ -1,62 +1,55 @@
 #import "ThemeManager.h"
 
 @implementation ThemeManager {
-    NSDictionary *_themeDict;
+    NSDictionary *_currentConfig;
 }
 
 + (instancetype)sharedManager {
-    static ThemeManager *sharedInstance = nil;
+    static ThemeManager *shared = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[self alloc] init];
-        [sharedInstance reloadConfig];
+        shared = [[self alloc] init];
     });
-    return sharedInstance;
+    return shared;
 }
 
 - (NSString *)configPath {
-    NSString *selectedTheme = [[NSUserDefaults standardUserDefaults] stringForKey:@"kbt_selectedTheme"];
+    // 读取用户选定的主题名
+    NSString *selectedTheme = [[NSUserDefaults standardUserDefaults] objectForKey:@"KBTSelectedTheme"];
     if (!selectedTheme || selectedTheme.length == 0) {
-        selectedTheme = @"theme_default.json";
+        selectedTheme = @"theme_default";
     }
-    NSString *path = [NSString stringWithFormat:@"/Library/Application Support/KeyboardTheme/%@", selectedTheme];
-    return path;
+
+    NSString *themeFile = [NSString stringWithFormat:@"%@.json", selectedTheme];
+    NSString *fullPath = [@"/var/mobile/Library/Preferences/com.axs66.KeyboardTheme/" stringByAppendingPathComponent:themeFile];
+
+    if (![[NSFileManager defaultManager] fileExistsAtPath:fullPath]) {
+        fullPath = [[NSBundle bundleWithPath:@"/Library/MobileSubstrate/DynamicLibraries/KeyboardTheme.bundle"] pathForResource:selectedTheme ofType:@"json"];
+    }
+
+    return fullPath;
 }
 
 - (void)reloadConfig {
     NSString *path = [self configPath];
-    NSData *data = [NSData dataWithContentsOfFile:path];
-    if (data) {
-        NSError *error;
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        if (!error && [json isKindOfClass:[NSDictionary class]]) {
-            _themeDict = json;
-            NSLog(@"[ThemeManager] Loaded theme: %@", path);
+    if (path && [[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        NSError *error = nil;
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+        if (!error && [dict isKindOfClass:[NSDictionary class]]) {
+            _currentConfig = dict;
         } else {
-            NSLog(@"[ThemeManager] Failed to parse theme JSON: %@", error);
+            NSLog(@"[KeyboardTheme] Failed to parse theme config: %@", error);
+            _currentConfig = @{};
         }
     } else {
-        NSLog(@"[ThemeManager] Theme file not found: %@", path);
+        NSLog(@"[KeyboardTheme] Theme config file not found.");
+        _currentConfig = @{};
     }
 }
 
-- (NSString *)stringForKey:(NSString *)key {
-    id val = _themeDict[key];
-    return [val isKindOfClass:[NSString class]] ? val : nil;
-}
-
-- (UIColor *)colorForKey:(NSString *)key {
-    NSString *hex = [self stringForKey:key];
-    if (!hex || hex.length == 0) return nil;
-
-    unsigned int r, g, b;
-    if (hex.length == 6 &&
-        [[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(0, 2)]] scanHexInt:&r] &&
-        [[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(2, 2)]] scanHexInt:&g] &&
-        [[NSScanner scannerWithString:[hex substringWithRange:NSMakeRange(4, 2)]] scanHexInt:&b]) {
-        return [UIColor colorWithRed:r / 255.0 green:g / 255.0 blue:b / 255.0 alpha:1.0];
-    }
-    return nil;
+- (NSDictionary *)currentConfig {
+    return _currentConfig ?: @{};
 }
 
 @end
