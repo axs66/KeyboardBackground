@@ -6,6 +6,7 @@ on:
       - '.github/workflows/build.yml'
       - 'Tweak.xm'
       - 'control'
+      - 'Settings/**'
     branches:
       - 'main'
   workflow_dispatch:
@@ -23,15 +24,7 @@ jobs:
       - name: Use Theos Setup Action
         uses: axs66/theos-action@main
 
-      # ✅ 新增：克隆并构建 Cephei
-      - name: Clone Cephei
-        run: |
-          rm -rf Cephei
-          git clone --depth=1 https://github.com/hbang/libcephei.git Cephei
-
-      - name: Build Cephei
-        run: make -C Cephei
-
+      # 不再克隆和编译 Cephei，去掉相关步骤
 
       - name: Clean previous packages
         run: rm -f ${{ github.workspace }}/packages/*.deb
