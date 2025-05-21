@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+   "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+    <dict>
+        <key>cell</key>
+        <string>PSGroupCell</string>
+        <key>label</key>
+        <string>Keyboard Theme Settings</string>
+    </dict>
+    <dict>
+        <key>default</key>
+        <string>#FF0000</string>
+        <key>id</key>
+        <string>keyColor</string>
+        <key>label</key>
+        <string>Key Color</string>
+        <key>specifier</key>
+        <string>ColorPicker</string>
+        <key>style</key>
+        <string>Default</string>
+        <key>type</key>
+        <string>color</string>
+    </dict>
+    <dict>
+        <key>default</key>
+        <true/>
+        <key>id</key>
+        <string>enableAnimation</string>
+        <key>label</key>
+        <string>Enable Animation</string>
+        <key>specifier</key>
+        <string>Switch</string>
+        <key>type</key>
+        <string>bool</string>
+    </dict>
+    <dict>
+        <key>label</key>
+        <string>Respring</string>
+        <key>cell</key>
+        <string>PSButtonCell</string>
+        <key>action</key>
+        <string>respring</string>
+    </dict>
+</array>
+</plist>
