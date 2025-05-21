@@ -1,10 +1,6 @@
 ARCHS = arm64 arm64e
 TARGET = iphone:clang:latest:15.0
 
-# 设置 Cephei 的头文件和库路径
-THEOS_INCLUDE_PATHS += $(THEOS_PROJECT_DIR)/Cephei/include
-THEOS_LIBRARY_PATHS += $(THEOS_PROJECT_DIR)/Cephei/lib
-
 # 主 tweak
 TWEAK_NAME = KeyboardTheme
 KeyboardTheme_FILES = Tweak.xm Settings/ThemeManager.m
