@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <notify.h>
-#import "ThemeManager.h"
+#import "Settings/ThemeManager.h"
 
 // 私有类完整声明，避免编译错误
 @interface UIKBKeyView : UIView
