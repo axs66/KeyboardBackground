@@ -9,13 +9,13 @@
 
 @implementation KBTRootListController
 
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        // 从 Settings/KeyboardTheme.plist 加载设置面板内容
-        [self loadFromSpecifierName:@"KeyboardTheme"];
+// 不需要重写 init，Theos 会自动加载 KeyboardTheme.plist
+
+- (NSArray *)specifiers {
+    if (!_specifiers) {
+        _specifiers = [self loadSpecifiersFromPlistName:@"KeyboardTheme" target:self];
     }
-    return self;
+    return _specifiers;
 }
 
 - (void)respring {
@@ -35,4 +35,3 @@
 }
 
 @end
-
